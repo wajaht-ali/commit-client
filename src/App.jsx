@@ -10,7 +10,7 @@ function App() {
   return (
     <div className='text-red-500'>
       The Commit: Your code buddie..
-    </div>
+    </div> 
   )
 }
 
