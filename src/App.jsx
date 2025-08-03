@@ -10,6 +10,7 @@ function App() {
   return (
     <div className='text-red-500'>
       The Commit: Your code buddie..
+      <p> wellcome to Commit</p>
     </div> 
   )
 }
