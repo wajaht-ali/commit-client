@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom"
 import PageNotFound from "./components/pages/PageNotFound.jsx";
 import Home from "./components/pages/Home.jsx";
 import './App.css'
+import Profile from './components/Profile/Profile';
 
 function App() {
 
