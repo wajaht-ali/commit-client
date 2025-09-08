@@ -1,11 +1,11 @@
 /* eslint-disable no-unused-vars */
-import { useState } from 'react'
 import { Routes, Route } from "react-router-dom"
+import './App.css'
+
 import PageNotFound from "./components/pages/PageNotFound.jsx";
 import Home from "./components/pages/Home.jsx";
-import './App.css'
-import Profile from './components/Profile/Profile';
-import Login from './components/pages/login.jsx';
+import Profile from './components/Profile/Profile.jsx';
+import Login from './components/pages/Login.jsx';
 import SignUp from './components/pages/SignUp.jsx';
 import Commit from './components/pages/Commit/Commit.jsx';
 
@@ -22,7 +22,7 @@ function App() {
 
         {/* Not Found */}
         <Route path="*" element={<PageNotFound />} />
-        
+
       </Routes>
     </>
   )
