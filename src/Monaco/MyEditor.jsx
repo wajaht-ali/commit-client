@@ -8,7 +8,7 @@ export default function MyEditor() {
         height="90vh"
         defaultLanguage="javascript"
         defaultValue="// Start coding here..."
-        theme="vs-dark"
+        theme="vs-light"
         onChange={(value) => console.log("Code changed:", value)}
       />
       

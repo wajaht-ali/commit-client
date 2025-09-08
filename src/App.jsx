@@ -15,13 +15,14 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<Home />} />
-
-        {/* Not Found */}
-        <Route path="*" element={<PageNotFound />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/commit" element={<Commit />} />
+
+        {/* Not Found */}
+        <Route path="*" element={<PageNotFound />} />
+        
       </Routes>
     </>
   )
