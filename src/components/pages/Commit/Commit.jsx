@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import Editor from '@monaco-editor/react'
 import { useState } from 'react'
+import SideBar from '../../Layout/SideBar'
 
 function Commit() {
   const [code, setCode] = useState(`console.log("Hello, world!");`);
@@ -49,29 +50,10 @@ function Commit() {
           </div>
           </nav>
           </header>
-
-            <main className='w-full h-min p-4  mb-6'>
-            {/* user details and room details aside bar */}
-            <div className='flex justify-between items-center mb-4 p-2 bg-gray-200 rounded-lg'>
-              <div>
-                <h2 className='text-lg font-semibold'>Room ID: 12345</h2>
-                <p className='text-sm text-gray-600'>Share this ID to invite others</p>
-              </div>
-              <div>
-                <ul className='list-none flex gap-4 '>
-                {/* user icon */}
-                  <li>
-                  <img src="https://www.svgrepo.com/show/7025/user.svg" alt="User Icon" className="inline w-6 h-6 mr-2" />
-                  </li>
-                  <li>
-                  <img src="https://www.svgrepo.com/show/7025/user.svg" alt="User Icon" className="inline w-6 h-6 mr-2" />
-                  </li>
-                 
-                  </ul>
-              </div>
-            </div>
+<div className='flex min-h-screen w-full bg-gray-100'>
+            <SideBar/>
             
-            {/* styling for the editor container and buttons÷ */}
+            <main className='w-full h-min p-4  mb-6'>
 
             <div className='flex flex-row items-center justify-center gap-4'>
             <div className='h-[350px] w-[700px] border-2 border-gray-300 rounded-lg overflow-hidden'>
@@ -84,12 +66,6 @@ function Commit() {
           options={{ fontSize: 16 }}
         />
             </div>
-            <button 
-        className='bg-green-500 text-white text-center h-10 px-4 py-2 rounded mt-2'
-        onClick={runCode} 
-        >
-          Run
-        </button>
             <div className='h-[350px] w-[700px] border-2 border-gray-300 rounded-lg overflow-hidden'>
               {/* <Editor /> */}
               <div
@@ -108,6 +84,17 @@ function Commit() {
         {output}
       </div>
             </div>
+            
+            
+            </div>
+             {/* user details and room details aside bar */}
+            <div className='flex items-center mb-4 p-2 rounded-lg justify-end'>
+              <button 
+        className='bg-green-500 text-white text-center h-10 px-4 py-2 rounded mt-2'
+        onClick={runCode} 
+        >
+          Run
+        </button>
             </div>
             {/* chat box */}
             <div className='mt-4 bg-gray-200 p-4 rounded-lg'>
@@ -126,8 +113,10 @@ function Commit() {
               </Link>
             </div>
 
-            
+           
             </main>
+            </div>
+            
     </>
   )
 }
