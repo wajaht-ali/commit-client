@@ -1,23 +1,13 @@
 /* eslint-disable no-unused-vars */
 
-import React, { useEffect, useState, useRef } from 'react';
-import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
-import Editor from '@monaco-editor/react';
-import { useSocket } from '../../../context/SocketContext.jsx';
-import toast from 'react-hot-toast';
+import { useEffect, useState, useRef } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { FaCopy } from 'react-icons/fa';
-
-const UserAvatar = ({ username }) => {
-  const initial = username ? username[0].toUpperCase() : '?';
-  return (
-    <div
-      className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-lg"
-      title={username}
-    >
-      {initial}
-    </div>
-  );
-};
+import Editor from '@monaco-editor/react';
+import toast from 'react-hot-toast';
+import { useSocket } from '../../../context/SocketContext.jsx';
+import { UserAvatar } from '../../../utils/Utilities.jsx';
+import { copyRoomId } from '../../../utils/Utilities.jsx';
 
 const EditorPage = () => {
   const { roomId } = useParams();
@@ -126,17 +116,6 @@ const EditorPage = () => {
     }
   };
 
-  const copyRoomId = async () => {
-    try {
-      if (roomId) {
-        await navigator.clipboard.writeText(roomId);
-        toast.success('Room ID copied to clipboard!');
-      }
-    } catch (err) {
-      toast.error('Failed to copy Room ID.');
-      console.error('Clipboard copy failed:', err);
-    }
-  };
 
   if (!socket) {
     return (
@@ -147,34 +126,37 @@ const EditorPage = () => {
   }
 
   return (
-    <div className="flex h-screen bg-gray-900 text-white font-sans">
-      <aside className="w-64 bg-gray-800 p-4 flex flex-col">
+    <div className="flex flex-col lg:flex-row h-screen bg-gray-900 text-white font-sans">
+
+      <aside className="w-full lg:w-64 bg-gray-800 p-4 flex flex-col shrink-0">
         <h1 className="text-2xl font-bold mb-4 border-b border-gray-600 pb-2">Commit</h1>
-        <div className="mb-6">
-          <h2 className="text-lg font-semibold mb-2">Connected Users ({connectedUsers.length})</h2>
-          <div className="flex flex-col gap-3">
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <h2 className="text-md lg:text-lg font-semibold mb-2">Connected Users ({connectedUsers.length})</h2>
+
+          <div className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto lg:overflow-x-hidden pb-2 lg:pb-0">
             {connectedUsers.map((user) => (
-              <div key={user.socketId} className="flex items-center gap-2">
+              <div key={user.socketId} className="flex flex-col lg:flex-row items-center gap-2">
                 <UserAvatar username={user.username} />
-                <span>{user.username}</span>
+                <span className="text-[12px] lg:text-lg lg:inline">{user.username}</span>
               </div>
             ))}
           </div>
         </div>
+
         <div className="mt-auto">
-          <button onClick={leaveRoom} className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors">
+          <button onClick={leaveRoom} className="w-auto lg:w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors mt-4 lg:mt-0">
             Leave Room
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 flex flex-col p-4 gap-4">
+      <main className="flex-1 flex flex-col p-4 gap-4 overflow-hidden">
         <div className="flex-shrink-0 bg-gray-800 rounded-lg p-2 flex items-center">
           <div className="flex items-center space-x-3 bg-gray-900 rounded-lg px-3 py-1">
             <span className="text-gray-400 text-sm">Room ID:</span>
             <span className="font-mono text-green-400">{roomId}</span>
             <button
-              onClick={copyRoomId}
+              onClick={() => copyRoomId(roomId)}
               title="Copy Room ID"
               className="text-gray-400 hover:text-white transition-colors hover:cursor-pointer"
             >
@@ -183,12 +165,13 @@ const EditorPage = () => {
           </div>
           <button
             onClick={runCode}
-            className="ml-auto bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition-colors"
+            className="ml-auto bg-green-600 hover:bg-green-700 text-white font-semibold lg:font-bold lg:py-2 py-1 px-3 lg:px-6 rounded transition-colors"
           >
             Run
           </button>
         </div>
-        <div className="flex-1 grid grid-rows-2 lg:grid-rows-1 lg:grid-cols-2 gap-4">
+
+        <div className="flex-1 grid grid-rows-2 lg:grid-rows-1 lg:grid-cols-2 gap-4 min-h-0">
           <div className="bg-gray-800 rounded-lg overflow-hidden h-full">
             <Editor
               height="100%"
