@@ -6,8 +6,10 @@ import { FaCopy } from 'react-icons/fa';
 import Editor from '@monaco-editor/react';
 import toast from 'react-hot-toast';
 import { useSocket } from '../../../context/SocketContext.jsx';
-import { UserAvatar } from '../../../utils/Utilities.jsx';
+import { defaultCodeTemplates, monacoLanguageMap, UserAvatar } from '../../../utils/Utilities.jsx';
 import { copyRoomId } from '../../../utils/Utilities.jsx';
+import { languageOptions } from '../../../utils/Utilities.jsx';
+import axios from 'axios';
 
 const EditorPage = () => {
   const { roomId } = useParams();
@@ -17,9 +19,17 @@ const EditorPage = () => {
   const codeRef = useRef(null);
   const hasJoined = useRef(false);
 
+  const [language, setLanguage] = useState(() => {
+    return localStorage.getItem('selectedLanguage') || 'javascript';
+  });
   const [connectedUsers, setConnectedUsers] = useState([]);
-  const [code, setCode] = useState(`// Welcome! Code will sync in real-time.`);
+  const [code, setCode] = useState(``);
   const [output, setOutput] = useState('');
+  const BASE_URI = import.meta.env.VITE_API_URL;
+
+  useEffect(() => {
+    setCode(defaultCodeTemplates[language]);
+  }, []);
 
   useEffect(() => {
     if (!socket) return;
@@ -36,11 +46,14 @@ const EditorPage = () => {
     socket.on('update-user-list', (users) => {
       setConnectedUsers(users);
     });
-
     const handleCodeUpdate = (newCode) => {
       setCode(newCode);
     };
     socket.on('code-update', handleCodeUpdate);
+    socket.on('language-update', (newLanguage) => {
+      setLanguage(newLanguage);
+      toast.success(`Language switched to ${languageOptions.find(l => l.value === newLanguage)?.label || 'a new language'}`);
+    });
 
     socket.on('get-code-state', () => {
       if (codeRef.current) {
@@ -74,6 +87,7 @@ const EditorPage = () => {
       socket.off('get-code-state');
       socket.off('user-left', handleUserLeft);
       socket.off('user-joined', handleUserJoined);
+      socket.off('language-update');
       socket.off('room-not-found', handleRoomNotFound);
     };
 
@@ -91,29 +105,67 @@ const EditorPage = () => {
   };
 
   const leaveRoom = () => {
+    localStorage.removeItem('selectedLanguage');
     if (socket) {
       socket.emit('leave-room');
     }
     navigate('/');
   };
 
-  const runCode = () => {
-    try {
-      let consoleOutput = '';
-      const originalConsoleLog = console.log;
-      console.log = (...args) => {
-        consoleOutput += args.join(' ') + '\n';
-      };
-      new Function(code)();
-      console.log = originalConsoleLog;
-      setOutput(consoleOutput || 'Execution finished with no output.');
-    } catch (err) {
-      if (err instanceof Error) {
-        setOutput(`Error: ${err.message}`);
-      } else {
-        setOutput('An unknown error occurred during execution.');
+  const handleLanguageChange = (e) => {
+    const newLanguage = e.target.value;
+    setLanguage(newLanguage);
+    localStorage.setItem('selectedLanguage', newLanguage);
+
+    const template = defaultCodeTemplates[newLanguage] || "// Start coding here...";
+    setCode(template);
+    codeRef.current = template;
+
+    socket.emit('language-change', { roomId, language: newLanguage });
+    socket.emit('code-change', { roomId, code: template });
+    toast.success(`Language switched to ${languageOptions.find(l => l.value === newLanguage)?.label || 'a new language'}`);
+  };
+
+  const runCode = async () => {
+    setOutput('Executing...');
+
+    if (language === 'javascript') {
+      try {
+        let consoleOutput = '';
+        const originalConsoleLog = console.log;
+        console.log = (...args) => {
+          consoleOutput += args.map(String).join(' ') + '\n';
+        };
+        new Function(code)();
+        console.log = originalConsoleLog;
+        setOutput(consoleOutput || 'Execution finished with no output.');
+      } catch (err) {
+        setOutput(err instanceof Error ? `Error: ${err.message}` : 'An unknown error occurred.');
       }
+      return;
     }
+
+    if (language === 'python' || language === 'cpp') {
+      try {
+        const response = await axios.post(`${BASE_URI}/api/v1/code/execute`, {
+          language,
+          code,
+        });
+        console.log("response: ", response);
+        setOutput(response.data.output || 'Execution finished with no output.');
+
+      } catch (error) {
+        console.log("Errorrr: ", error);
+        if (error.response && error.response.data && error.response.data.output) {
+          setOutput(`Error: ${error.response.data.output}`);
+        } else {
+          setOutput('Failed to connect to the execution service. Please check the server.');
+        }
+      }
+      return;
+    }
+
+    setOutput(`Execution for language "${language}" is not supported.`);
   };
 
 
@@ -144,43 +196,71 @@ const EditorPage = () => {
         </div>
 
         <div className="mt-auto">
-          <button onClick={leaveRoom} className="w-auto lg:w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors mt-4 lg:mt-0">
+          <button onClick={leaveRoom} className="w-auto lg:w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors mt-4 lg:mt-0 hover:cursor-pointer">
             Leave Room
           </button>
         </div>
       </aside>
 
       <main className="flex-1 flex flex-col p-4 gap-4 overflow-hidden">
-        <div className="flex-shrink-0 bg-gray-800 rounded-lg p-2 flex items-center">
-          <div className="flex items-center space-x-3 bg-gray-900 rounded-lg px-3 py-1">
-            <span className="text-gray-400 text-sm">Room ID:</span>
-            <span className="font-mono text-green-400">{roomId}</span>
+        <div className="flex items-center justify-between bg-gray-800 rounded-md px-3 py-2 space-x-2 sm:flex-nowrap">
+
+          <div className="flex items-center space-x-2 bg-gray-900 rounded-md px-2 py-1">
+            <span className="text-gray-400 text-xs sm:text-sm">Room:</span>
+            <span className="font-mono text-green-400 text-xs sm:text-sm peer" onClick={() => copyRoomId(roomId)}>{roomId}</span>
             <button
               onClick={() => copyRoomId(roomId)}
               title="Copy Room ID"
-              className="text-gray-400 hover:text-white transition-colors hover:cursor-pointer"
+              className="text-gray-400 hover:text-white transition-colors cursor-pointer peer-hover:text-white peer-hover:cursor-default"
             >
-              <FaCopy />
+              <FaCopy size={12} />
             </button>
           </div>
+
+          <div className="relative flex-shrink-0">
+            <select
+              value={language}
+              onChange={handleLanguageChange}
+              className="bg-[#1e1e1e] text-gray-200 font-mono text-xs sm:text-sm border border-gray-700 rounded-md 
+                 px-3 py-1 pr-8 appearance-none cursor-pointer transition-all 
+                 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500
+                 hover:border-gray-500 hover:bg-[#252526]"
+            >
+              {languageOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs">
+              ▼
+            </span>
+          </div>
+
           <button
             onClick={runCode}
-            className="ml-auto bg-green-600 hover:bg-green-700 text-white font-semibold lg:font-bold lg:py-2 py-1 px-3 lg:px-6 rounded transition-colors"
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold text-xs sm:text-sm py-1 px-3 rounded transition-colors hover:cursor-pointer"
           >
             Run
           </button>
         </div>
+
 
         <div className="flex-1 grid grid-rows-2 lg:grid-rows-1 lg:grid-cols-2 gap-4 min-h-0">
           <div className="bg-gray-800 rounded-lg overflow-hidden h-full">
             <Editor
               height="100%"
               theme="vs-dark"
-              language="javascript"
+              language={monacoLanguageMap[language] || "javascript"}
               value={code}
               onChange={handleEditorChange}
-              options={{ fontSize: 14, minimap: { enabled: false } }}
-            />
+              options={{
+                fontSize: 14,
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                automaticLayout: true,
+              }} />
+
           </div>
           <div className="bg-gray-800 rounded-lg flex flex-col h-full">
             <div className="p-3 bg-gray-700 rounded-t-lg">

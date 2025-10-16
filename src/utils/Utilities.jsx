@@ -24,3 +24,29 @@ export const copyRoomId = async (roomId) => {
         console.error('Clipboard copy failed:', err);
     }
 };
+
+export const languageOptions = [
+    { value: 'javascript', label: 'JavaScript' },
+    { value: 'python', label: 'Python' },
+    { value: 'cpp', label: 'C++' },
+];
+
+export const monacoLanguageMap = {
+    javascript: "javascript",
+    python: "python",
+    cpp: "cpp",
+};
+
+export const defaultCodeTemplates = {
+    cpp: `#include <iostream>
+using namespace std;
+
+int main() {
+    cout << "Hi from C++" << endl;
+    return 0;
+}`,
+
+    python: `print("Hi from Python!")`,
+
+    javascript: `console.log("Hi from JavaScript!");`,
+};
