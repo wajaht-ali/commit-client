@@ -10,6 +10,7 @@ import { defaultCodeTemplates, monacoLanguageMap, UserAvatar } from '../../../ut
 import { copyRoomId } from '../../../utils/Utilities.jsx';
 import { languageOptions } from '../../../utils/Utilities.jsx';
 import axios from 'axios';
+import AiAssistantModal from '../../ui/AiAssistantModal.jsx';
 
 const EditorPage = () => {
   const { roomId } = useParams();
@@ -25,6 +26,11 @@ const EditorPage = () => {
   const [connectedUsers, setConnectedUsers] = useState([]);
   const [code, setCode] = useState(``);
   const [output, setOutput] = useState('');
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState('');
+  const [generatedCode, setGeneratedCode] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+
   const BASE_URI = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -168,6 +174,35 @@ const EditorPage = () => {
     setOutput(`Execution for language "${language}" is not supported.`);
   };
 
+  const handleGenerateCode = async () => {
+    setIsGenerating(true);
+    setGeneratedCode('');
+    try {
+      const response = await axios.post(`${BASE_URI}/api/v1/ai/code-generation`, {
+        prompt: aiPrompt,
+        language,
+      });
+      setGeneratedCode(response.data.generatedCode);
+    } catch (error) {
+      toast.error('Failed to generate code. Please try again.');
+      console.error(error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const insertGeneratedCode = () => {
+    const newCode = code + '\n\n' + generatedCode;
+    setCode(newCode);
+
+    if (socket) {
+      socket.emit('code-change', { roomId, code: newCode });
+    }
+
+    setIsAiModalOpen(false);
+    setAiPrompt('');
+    setGeneratedCode('');
+  };
 
   if (!socket) {
     return (
@@ -181,7 +216,22 @@ const EditorPage = () => {
     <div className="flex flex-col lg:flex-row h-screen bg-gray-900 text-white font-sans">
 
       <aside className="w-full lg:w-64 bg-gray-800 p-4 flex flex-col shrink-0">
-        <h1 className="text-2xl font-bold mb-4 border-b border-gray-600 pb-2">Commit</h1>
+        <div className="flex flex-row lg:flex-col justify-between items-center lg:items-start mb-4 border-b border-gray-600 pb-2">
+          <h1 className="text-2xl font-bold">Commit</h1>
+
+          <div className="block md:hidden items-center space-x-2 bg-gray-900 rounded-md px-2 py-1">
+            <span className="text-gray-400 text-xs sm:text-sm">Room:</span>
+            <span className="font-mono text-green-400 text-xs sm:text-sm peer" onClick={() => copyRoomId(roomId)}>{roomId}</span>
+            <button
+              onClick={() => copyRoomId(roomId)}
+              title="Copy Room ID"
+              className="text-gray-400 hover:text-white transition-colors cursor-pointer peer-hover:text-white peer-hover:cursor-default"
+            >
+              <FaCopy size={12} />
+            </button>
+          </div>
+        </div>
+
         <div className="flex-1 flex flex-col overflow-hidden">
           <h2 className="text-md lg:text-lg font-semibold mb-2">Connected Users ({connectedUsers.length})</h2>
 
@@ -205,7 +255,7 @@ const EditorPage = () => {
       <main className="flex-1 flex flex-col p-4 gap-4 overflow-hidden">
         <div className="flex items-center justify-between bg-gray-800 rounded-md px-3 py-2 space-x-2 sm:flex-nowrap">
 
-          <div className="flex items-center space-x-2 bg-gray-900 rounded-md px-2 py-1">
+          <div className="hidden md:flex items-center space-x-2 bg-gray-900 rounded-md px-2 py-1">
             <span className="text-gray-400 text-xs sm:text-sm">Room:</span>
             <span className="font-mono text-green-400 text-xs sm:text-sm peer" onClick={() => copyRoomId(roomId)}>{roomId}</span>
             <button
@@ -238,13 +288,21 @@ const EditorPage = () => {
           </div>
 
           <button
+            onClick={() => setIsAiModalOpen(true)}
+            className="ml-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm py-1 px-3 rounded transition-colors hover:cursor-pointer flex items-center"
+            title="Generate code with AI"
+          >
+            <span role="img" aria-label="sparkles" className="mr-2">✨</span>
+            Ask AI
+          </button>
+
+          <button
             onClick={runCode}
             className="bg-green-600 hover:bg-green-700 text-white font-semibold text-xs sm:text-sm py-1 px-3 rounded transition-colors hover:cursor-pointer"
           >
             Run
           </button>
         </div>
-
 
         <div className="flex-1 grid grid-rows-2 lg:grid-rows-1 lg:grid-cols-2 gap-4 min-h-0">
           <div className="bg-gray-800 rounded-lg overflow-hidden h-full">
@@ -260,7 +318,6 @@ const EditorPage = () => {
                 scrollBeyondLastLine: false,
                 automaticLayout: true,
               }} />
-
           </div>
           <div className="bg-gray-800 rounded-lg flex flex-col h-full">
             <div className="p-3 bg-gray-700 rounded-t-lg">
@@ -272,6 +329,17 @@ const EditorPage = () => {
           </div>
         </div>
       </main>
+
+      <AiAssistantModal
+        isOpen={isAiModalOpen}
+        prompt={aiPrompt}
+        setPrompt={setAiPrompt}
+        isGenerating={isGenerating}
+        generatedCode={generatedCode}
+        onGenerate={handleGenerateCode}
+        onInsert={insertGeneratedCode}
+        onClose={() => setIsAiModalOpen(false)}
+      />
     </div>
   );
 }
