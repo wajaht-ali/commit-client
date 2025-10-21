@@ -112,10 +112,11 @@ const EditorPage = () => {
 
   const leaveRoom = () => {
     localStorage.removeItem('selectedLanguage');
+
     if (socket) {
-      socket.emit('leave-room');
+      socket.disconnect();
     }
-    navigate('/');
+    window.location.replace('/');
   };
 
   const handleLanguageChange = (e) => {
