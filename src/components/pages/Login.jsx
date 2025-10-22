@@ -1,46 +1,105 @@
-import React from 'react'
+import { useState } from "react";
+import { auth, googleProvider, githubProvider } from "../../Firebase";
+import {
+  signInWithEmailAndPassword,
+  signInWithPopup,
+    sendPasswordResetEmail,
+} from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
-function Login() {
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+     const userCred = await signInWithEmailAndPassword(auth, email, password);
+      if (!userCred.user.emailVerified) {
+        alert("Please verify your email before logging in.");
+        return;
+      }
+      navigate("/");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      navigate("/");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleGithubLogin = async () => {
+    try {
+      await signInWithPopup(auth, githubProvider);
+      navigate("/");
+    } catch (error) {
+      alert(error.message);
+    }
+
+    
+  };
+
   return (
-    <>
-      {/* login page  for commit */}
-      <div className='relative min-h-screen flex flex-row'>
-      <div 
-        className="flex flex-col items-center justify-center min-h-screen bg-gray-100 w-full"
-      >
-        <h1 className="text-3xl font-bold">Wellcome To Commit</h1>
-        <form className="flex flex-col space-y-4 mt-4">
-          <input 
-            type="text"
-            placeholder="Username"
-            className="px-4 py-2 border border-gray-300 rounded"
+    <div className="flex items-center justify-center min-h-screen bg-gray-500">
+      <div className="w-full max-w-md p-8 bg-gray-700 shadow-lg rounded-2xl">
+        <h2 className="text-2xl font-bold text-center mb-6">Login</h2>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <input
+            type="email"
+            placeholder="Email"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setEmail(e.target.value)}
           />
-          <input 
+          <input
             type="password"
             placeholder="Password"
-            className="px-4 py-2 border border-gray-300 rounded"
-            />
-          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          >
             Login
           </button>
         </form>
-        <div className="mt-4">
-          <p className="text-sm">
-            Don't have an account? <a href="/signup" className="text-blue-500">Sign up</a>
-          </p>
+        <div className="mt-4 text-center">
+          <p className="text-gray-600">Or login with</p>
+          <div className="flex justify-center mt-2 gap-4">
+            <button
+              onClick={handleGoogleLogin}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+            >
+              Google
+            </button>
+            <button
+              onClick={handleGithubLogin}
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900"
+            >
+              GitHub
+            </button>
+          </div>
         </div>
-        <div className="mt-4">
-          <p className="text-sm">
-            Forgot your password? <a href="/reset-password" className="text-blue-500">Reset it</a>
-          </p>
-        </div>
+        <p className="mt-4 text-sm text-center">
+          Don’t have an account?{" "}
+          <a href="/signup" className="text-blue-600 hover:underline">
+            Sign Up
+          </a>
+        </p>
+         <p className="mt-4 text-sm text-center">
+          Forgotten Your Password?{" "}
+          <a href="/reset-password" className="text-blue-600 hover:underline">
+            Reset Password
+          </a>
+        </p>
       </div>
-      <div className=" w-full  justify-center items-center h-screen hidden md:flex">
-      <img src="https://images.unsplash.com/photo-1526925539332-aa3b66e35444?q=80&w=1065&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="login side image" className="object-cover w-full h-full" />
-      </div>
-      </div>
-    </>
-  )
+    </div>
+  );
 }
-
-export default Login
