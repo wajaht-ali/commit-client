@@ -1,54 +1,101 @@
-import React from 'react'
+import { useState } from "react";
+import { auth, googleProvider, githubProvider } from "../../Firebase";
+import {
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  sendEmailVerification,
+} from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 
+export default function Signup() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-function SignUp() {
-  
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    try {
+    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      await sendEmailVerification(userCred.user);
+      alert("Signup successful! Please check your email to verify your account.");
+      navigate("/");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleGoogleSignup = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
+      navigate("/");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleGithubSignup = async () => {
+    try {
+      await signInWithPopup(auth, githubProvider);
+      navigate("/");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   return (
-    <div className='relative min-h-screen flex flex-row'>
-    <div className=" w-full-2/3  justify-center items-center h-screen hidden md:flex">
-        <img src="https://images.unsplash.com/photo-1526925539332-aa3b66e35444?q=80&w=1065&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="login side image" className="object-cover w-full h-full" />
-      </div>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 w-full">
-        <h1 className="text-3xl font-bold">Register Your Account</h1>
-        <form className="flex flex-col space-y-4 mt-4">
+    <div className="flex items-center justify-center min-h-screen bg-gray-500">
+      <div className="w-full max-w-md p-8 bg-gray-700 shadow-lg rounded-2xl">
+        <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
+        <form onSubmit={handleSignup} className="space-y-4">
         <input
             type="text"
             placeholder="Name"
-            className="px-4 py-2 border border-gray-300 rounded"
-          /><input
-            type="email"
-            placeholder="Email"
-            className="px-4 py-2 border border-gray-300 rounded"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setName(e.target.value)}
           />
           <input
-            type="text"
-            placeholder="Username"
-            className="px-4 py-2 border border-gray-300 rounded"
+            type="email"
+            placeholder="Email"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setEmail(e.target.value)}
           />
           <input
             type="password"
             placeholder="Password"
-            className="px-4 py-2 border border-gray-300 rounded"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            onChange={(e) => setPassword(e.target.value)}
           />
-          <input
-            type='checkbox'
-            className="h-4 w-4"
-            />
-          <span className="text-sm">I agree to the <a href="#" className="text-blue-500">Terms and Conditions</a></span>
-          <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded">
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+          >
             Sign Up
           </button>
         </form>
-        
-        <div className="mt-4">
-          <p className="text-sm">
-            Already have an account? <a href="/login" className="text-blue-500">Login</a>
-          </p>
+        <div className="mt-4 text-center">
+          <p className="text-gray-600">Or sign up with</p>
+          <div className="flex justify-center mt-2 gap-4">
+            <button
+              onClick={handleGoogleSignup}
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+            >
+              Google
+            </button>
+            <button
+              onClick={handleGithubSignup}
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900"
+            >
+              GitHub
+            </button>
+          </div>
         </div>
+        <p className="mt-4 text-sm text-center">
+          Already have an account?{" "}
+          <a href="/login" className="text-blue-600 hover:underline">
+            Login
+          </a>
+        </p>
       </div>
-    
     </div>
-  )
+  );
 }
-
-export default SignUp

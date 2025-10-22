@@ -1,9 +1,21 @@
 import React, { useState } from 'react';
 import { FaLaptopCode, FaBars, FaTimes } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import ButtonCard from './ButtonCard';
 
 const Navbar = ({ toggleModal }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [show, setShow] = useState(false);
+
+    const navigate = useNavigate();
+    const handleLogoClick = () => {
+        navigate('/login');
+    };
+
+    const handleClick = () => {
+        setShow(!show);
+    }
 
     return (
         <nav className="bg-gray-800 shadow-lg sticky top-0 z-40">
@@ -25,6 +37,19 @@ const Navbar = ({ toggleModal }) => {
                         >
                             Start Now
                         </button>
+                        {/* profile icon */}
+                        <div className="relative">
+                            <button onDoubleClick={handleLogoClick} onClick={handleClick} className="flex items-center focus:outline-none hover:cursor-pointer hover:opacity-80">
+                                <img
+                                    src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=22c55e"
+                                    alt="Profile"
+                                    className="rounded-full"
+                                    style={{ width: '40px', height: '40px' }}
+
+                                />
+                            </button>
+                        
+                        </div>
                     </div>
 
                     <div className="md:hidden">
