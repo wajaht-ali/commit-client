@@ -261,37 +261,57 @@ const EditorPage = () => {
           </div>
         </div>
 
-        <div className="mt-4">
+        {/* Voice Section */}
+        <section className="mt-4">
           <h2 className="text-md lg:text-lg font-semibold mb-2">Voice</h2>
-          <VoiceControls
-            callActive={callActive}
-            joined={joined}
-            muted={muted}
-            isRoomCreator={isRoomCreator}
-            onStart={startCall}
-            onJoin={joinCall}
-            onLeave={leaveCall}
-            onToggleMute={toggleMute}
-          />
-          {voiceError && (
-            <div className="text-red-400 text-xs mt-2">{voiceError}</div>
-          )}
-          <div className="mt-3">
-            <RemoteAudioGrid
-              remoteStreams={remoteStreams}
-              connectedUsers={connectedUsers}
+
+          {/* Voice Controls - simplified, clean card style */}
+          <div className=" bg-gray-900 border border-gray-700 rounded-md p-3 mb-2">
+            <VoiceControls
+              callActive={callActive}
+              joined={joined}
+              muted={muted}
+              isRoomCreator={isRoomCreator}
+              onStart={startCall}
+              onJoin={joinCall}
+              onLeave={leaveCall}
+              onToggleMute={toggleMute}
             />
           </div>
-        </div>
+
+          {voiceError && (
+            <p className="text-red-400 text-xs mt-2">{voiceError}</p>
+          )}
+
+          {/* Audio Streams (hidden visually, handled internally) */}
+          <RemoteAudioGrid
+            remoteStreams={remoteStreams}
+            connectedUsers={connectedUsers}
+          />
+        </section>
 
         <div className="flex-1 flex flex-col overflow-hidden">
           <h2 className="text-md lg:text-lg font-semibold mb-2">Connected Users ({connectedUsers.length})</h2>
 
-          <div className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto lg:overflow-x-hidden pb-2 lg:pb-0">
+          <div className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto pb-2">
             {connectedUsers.map((user) => (
-              <div key={user.socketId} className="flex flex-col lg:flex-row items-center gap-2">
-                <UserAvatar username={user.username} />
-                <span className="text-[12px] lg:text-lg lg:inline">{user.username}</span>
+              <div
+                key={user.socketId}
+                className="flex items-center gap-2 bg-gray-900/60 rounded-md px-2 py-1"
+              >
+                {/* Avatar with call status indicator */}
+                <div className="relative">
+                  <UserAvatar username={user.username} />
+                  {user.inVoiceCall && (
+                    <span
+                      className="absolute bottom-0 right-0 bg-green-500 border-2 border-gray-800 rounded-full p-[3px]"
+                      title="In Voice Call"
+                    >
+                      <FaMicrophone size={8} className="text-white" />
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs lg:text-sm">{user.username}</span>
               </div>
             ))}
           </div>

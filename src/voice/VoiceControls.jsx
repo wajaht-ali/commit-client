@@ -15,7 +15,7 @@ export default function VoiceControls({
             {isRoomCreator && !callActive && (
                 <button
                     onClick={onStart}
-                    className="bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm py-1 px-3 rounded"
+                    className="bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm py-1 px-3 rounded hover:cursor-pointer"
                     title="Start voice call (creator only)"
                 >
                     Start Call
@@ -25,7 +25,7 @@ export default function VoiceControls({
             {callActive && !joined && (
                 <button
                     onClick={onJoin}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm py-1 px-3 rounded"
+                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm py-1 px-3 rounded hover:cursor-pointer"
                     title="Join voice call"
                 >
                     Join
@@ -36,14 +36,14 @@ export default function VoiceControls({
                 <>
                     <button
                         onClick={onToggleMute}
-                        className="bg-gray-700 hover:bg-gray-600 text-white text-xs sm:text-sm py-1 px-3 rounded"
+                        className="bg-gray-700 hover:bg-gray-600 text-white text-xs sm:text-sm py-1 px-3 rounded hover:cursor-pointer"
                         title={muted ? "Unmute" : "Mute"}
                     >
                         {muted ? "Unmute" : "Mute"}
                     </button>
                     <button
                         onClick={onLeave}
-                        className="bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm py-1 px-3 rounded"
+                        className="bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm py-1 px-3 rounded hover:cursor-pointer"
                         title="Leave voice call"
                     >
                         Leave
