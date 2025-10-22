@@ -11,6 +11,10 @@ import { copyRoomId } from '../../../utils/Utilities.jsx';
 import { languageOptions } from '../../../utils/Utilities.jsx';
 import axios from 'axios';
 import AiAssistantModal from '../../ui/AiAssistantModal.jsx';
+import VoiceControls from '../../../voice/VoiceControls.jsx';
+import RemoteAudioGrid from '../../../voice/RemoteAudioGrid.jsx';
+import { useVoiceCall } from '../../../voice/useVoiceCall.js';
+
 
 const EditorPage = () => {
   const { roomId } = useParams();
@@ -31,7 +35,20 @@ const EditorPage = () => {
   const [generatedCode, setGeneratedCode] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
 
+  const isRoomCreator = connectedUsers[0]?.socketId === socket?.id;
   const BASE_URI = import.meta.env.VITE_API_URL;
+
+  const {
+    callActive,
+    joined,
+    muted,
+    remoteStreams,
+    startCall,
+    joinCall,
+    leaveCall,
+    toggleMute,
+    errors: voiceError,
+  } = useVoiceCall({ socket, roomId, isRoomCreator });
 
   useEffect(() => {
     setCode(defaultCodeTemplates[language]);
@@ -52,6 +69,7 @@ const EditorPage = () => {
     socket.on('update-user-list', (users) => {
       setConnectedUsers(users);
     });
+
     const handleCodeUpdate = (newCode) => {
       setCode(newCode);
     };
@@ -87,6 +105,15 @@ const EditorPage = () => {
     };
     socket.on('room-not-found', handleRoomNotFound);
 
+    const handleRoomFull = ({ message }) => {
+      toast.error(message || "Room is full. Please try creating a new one.");
+      setTimeout(() => {
+        window.location.replace('/');
+      }, 2000);
+    };
+
+    socket.on('room-full', handleRoomFull);
+
     return () => {
       socket.off('update-user-list');
       socket.off('code-update', handleCodeUpdate);
@@ -95,6 +122,7 @@ const EditorPage = () => {
       socket.off('user-joined', handleUserJoined);
       socket.off('language-update');
       socket.off('room-not-found', handleRoomNotFound);
+      socket.off('room-full', handleRoomFull);
     };
 
   }, [socket, roomId, location.state, navigate]);
@@ -230,6 +258,29 @@ const EditorPage = () => {
             >
               <FaCopy size={12} />
             </button>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          <h2 className="text-md lg:text-lg font-semibold mb-2">Voice</h2>
+          <VoiceControls
+            callActive={callActive}
+            joined={joined}
+            muted={muted}
+            isRoomCreator={isRoomCreator}
+            onStart={startCall}
+            onJoin={joinCall}
+            onLeave={leaveCall}
+            onToggleMute={toggleMute}
+          />
+          {voiceError && (
+            <div className="text-red-400 text-xs mt-2">{voiceError}</div>
+          )}
+          <div className="mt-3">
+            <RemoteAudioGrid
+              remoteStreams={remoteStreams}
+              connectedUsers={connectedUsers}
+            />
           </div>
         </div>
 

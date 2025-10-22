@@ -50,3 +50,10 @@ int main() {
 
     javascript: `console.log("Hi from JavaScript!");`,
 };
+
+export const RTC_CONFIG = {
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" }, // free STUN server
+
+    ],
+};

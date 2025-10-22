@@ -13,7 +13,7 @@ const RoomModal = ({ toggleModal }) => {
     const createNewRoom = (e) => {
         e.preventDefault();
         const id = nanoid().toUpperCase();
-        console.log("ID : ", id);
+        // console.log("ID : ", id);
         toast.success('Created a new room!');
         navigate(`/editor/${id}`, {
             state: {
