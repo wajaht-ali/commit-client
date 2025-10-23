@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import Navbar from './Navbatr';
+import Navbar from './Navbar';
 import Footer from './Footer';
 import RoomModal from '../ui/RoomModal';
 

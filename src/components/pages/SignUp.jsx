@@ -1,101 +1,166 @@
+/* eslint-disable no-unused-vars */
+"use client";
+
+import { createUserWithEmailAndPassword, sendEmailVerification, signInWithPopup } from "firebase/auth";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { auth, googleProvider, githubProvider } from "../../Firebase";
-import {
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  sendEmailVerification,
-} from "firebase/auth";
+import { auth, githubProvider, googleProvider } from "../../Firebase";
 import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
     try {
-    const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
       await sendEmailVerification(userCred.user);
-      alert("Signup successful! Please check your email to verify your account.");
       navigate("/");
-    } catch (error) {
-      alert(error.message);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleGoogleSignup = async () => {
+  const handleProviderSignup = async (provider) => {
+    setLoading(true);
+    setError("");
     try {
-      await signInWithPopup(auth, googleProvider);
+      await signInWithPopup(auth, provider);
       navigate("/");
-    } catch (error) {
-      alert(error.message);
-    }
-  };
-
-  const handleGithubSignup = async () => {
-    try {
-      await signInWithPopup(auth, githubProvider);
-      navigate("/");
-    } catch (error) {
-      alert(error.message);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-500">
-      <div className="w-full max-w-md p-8 bg-gray-700 shadow-lg rounded-2xl">
-        <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
+    <motion.div
+      className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+    >
+      {/* Blur animated background */}
+      <motion.div
+        className="absolute inset-0 backdrop-blur-3xl bg-white/5"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.2 }}
+      />
+
+      {/* Loading Popper */}
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="w-14 h-14 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ repeat: Infinity, duration: 1.2 }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Signup card */}
+      <motion.div
+        className="relative w-full max-w-md p-8 bg-gray-800/70 shadow-2xl rounded-2xl backdrop-blur-lg"
+        initial={{ y: 30, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <h2 className="text-3xl font-semibold text-center mb-6 text-white tracking-tight">
+          Create your account
+        </h2>
+
+        {error && (
+          <motion.p
+            className="text-red-400 text-center mb-4 text-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            {error}
+          </motion.p>
+        )}
+
         <form onSubmit={handleSignup} className="space-y-4">
-        <input
+          <input
             type="text"
-            placeholder="Name"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Full Name"
+            className="w-full p-3 bg-gray-900/50 text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
+
           <input
             type="email"
             placeholder="Email"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 bg-gray-900/50 text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
+
           <input
             type="password"
             placeholder="Password"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 bg-gray-900/50 text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
+
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-all duration-200 disabled:opacity-50"
           >
             Sign Up
           </button>
         </form>
-        <div className="mt-4 text-center">
-          <p className="text-gray-600">Or sign up with</p>
-          <div className="flex justify-center mt-2 gap-4">
+
+        <div className="mt-6 text-center">
+          <p className="text-gray-400 mb-2 text-sm">or sign up with</p>
+          <div className="flex justify-center gap-4">
             <button
-              onClick={handleGoogleSignup}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+              onClick={() => handleProviderSignup(googleProvider)}
+              className="bg-red-500/80 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all duration-200"
             >
               Google
             </button>
             <button
-              onClick={handleGithubSignup}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900"
+              onClick={() => handleProviderSignup(githubProvider)}
+              className="bg-gray-700/80 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition-all duration-200"
             >
               GitHub
             </button>
           </div>
         </div>
-        <p className="mt-4 text-sm text-center">
+
+        <p className="mt-6 text-sm text-center text-gray-400">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-600 hover:underline">
+          <a href="/login" className="text-blue-400 hover:underline">
             Login
           </a>
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
+

@@ -1,18 +1,16 @@
-// Import the functions you need from the SDKs you need
+/* eslint-disable no-unused-vars */
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth , GoogleAuthProvider, GithubAuthProvider} from "firebase/auth";
+import { getAuth, GoogleAuthProvider, GithubAuthProvider } from "firebase/auth";
 
-
-// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCajqoregmFjP6uVUZ9cLcWNQ-NgEzD8a0",
-  authDomain: "commit-b7942.firebaseapp.com",
-  projectId: "commit-b7942",
-  storageBucket: "commit-b7942.firebasestorage.app",
-  messagingSenderId: "71009794115",
-  appId: "1:71009794115:web:39bea90b012901a688bcf6",
-  measurementId: "G-Y7BXBY0Y2W"
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_APP_ID,
+  measurementId: import.meta.env.VITE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
@@ -21,4 +19,3 @@ const analytics = getAnalytics(app);
 export const auth = getAuth(app);
 export const googleProvider = new GoogleAuthProvider();
 export const githubProvider = new GithubAuthProvider();
-

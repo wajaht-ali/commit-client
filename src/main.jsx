@@ -5,14 +5,17 @@ import './index.css'
 import App from './App.jsx'
 import { SocketProvider } from './context/SocketContext.jsx';
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from './context/AuthContext.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <SocketProvider>
-      <Router>
-        <App />
-      </Router>
-    </SocketProvider>
+    <AuthProvider>
+      <SocketProvider>
+        <Router>
+          <App />
+        </Router>
+      </SocketProvider>
+    </AuthProvider>
     <Toaster />
   </StrictMode>,
 )

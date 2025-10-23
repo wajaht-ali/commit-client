@@ -57,3 +57,30 @@ export const RTC_CONFIG = {
 
     ],
 };
+
+
+export const createUUID = () => {
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
+const CLIENT_ID_KEY = 'commit:clientId';
+const USERNAME_KEY = 'commit:username';
+
+export const getOrCreateClientId = () => {
+    let id = localStorage.getItem(CLIENT_ID_KEY);
+    if (!id) {
+        id = createUUID();
+        localStorage.setItem(CLIENT_ID_KEY, id);
+    }
+    return id;
+};
+
+export const getOrCreateUsername = () => {
+    let name = localStorage.getItem(USERNAME_KEY);
+    if (!name) {
+        name = `User_${createUUID().slice(0, 6)}`;
+        localStorage.setItem(USERNAME_KEY, name);
+    }
+    return name;
+};

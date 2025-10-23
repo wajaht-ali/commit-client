@@ -5,6 +5,8 @@ import { Toaster } from "react-hot-toast";
 import Layout from "./components/Layout/Layout.jsx";
 import Home from "./components/pages/Home.jsx";
 import './App.css';
+import Login from "./components/pages/Login.jsx";
+import Signup from "./components/pages/SignUp.jsx";
 
 function App() {
   return (
@@ -13,6 +15,8 @@ function App() {
         <Toaster />
       </div>
       <Routes>
+        <Route path="/auth/signup" element={<Signup />} />
+        <Route path="/auth/login" element={<Login />} />
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
         </Route>

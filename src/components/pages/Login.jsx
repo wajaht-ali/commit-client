@@ -1,11 +1,13 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { auth, googleProvider, githubProvider } from "../../Firebase";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
-    sendPasswordResetEmail,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -15,35 +17,39 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-     const userCred = await signInWithEmailAndPassword(auth, email, password);
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
       if (!userCred.user.emailVerified) {
-        alert("Please verify your email before logging in.");
+        toast.error("Please verify your email before logging in.");
         return;
       }
+      toast.success("Welcome back!");
       navigate("/");
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     }
   };
 
+  // ✅ Google Login (fixed)
   const handleGoogleLogin = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
-      navigate("/");
+      toast.success("Logged in successfully!");
+      // Wait for Firebase to update context, then navigate
+      setTimeout(() => navigate("/"), 300);
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     }
   };
 
+  // ✅ GitHub Login (fixed)
   const handleGithubLogin = async () => {
     try {
       await signInWithPopup(auth, githubProvider);
-      navigate("/");
+      toast.success("Logged in successfully!");
+      setTimeout(() => navigate("/"), 300);
     } catch (error) {
-      alert(error.message);
+      toast.error(error.message);
     }
-
-    
   };
 
   return (
@@ -70,6 +76,7 @@ export default function Login() {
             Login
           </button>
         </form>
+
         <div className="mt-4 text-center">
           <p className="text-gray-600">Or login with</p>
           <div className="flex justify-center mt-2 gap-4">
@@ -87,13 +94,14 @@ export default function Login() {
             </button>
           </div>
         </div>
+
         <p className="mt-4 text-sm text-center">
           Don’t have an account?{" "}
-          <a href="/signup" className="text-blue-600 hover:underline">
+          <a href="/auth/signup" className="text-blue-600 hover:underline">
             Sign Up
           </a>
         </p>
-         <p className="mt-4 text-sm text-center">
+        <p className="mt-4 text-sm text-center">
           Forgotten Your Password?{" "}
           <a href="/reset-password" className="text-blue-600 hover:underline">
             Reset Password
