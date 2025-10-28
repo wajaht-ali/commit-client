@@ -2,8 +2,13 @@ import React from 'react'
 import { FaLaptopCode } from 'react-icons/fa';
 import { RxDashboard } from "react-icons/rx";
 import { MdArrowDropUp } from "react-icons/md";
-const Profile = () => {
+import { motion, AnimatePresence } from "framer-motion";
+import { useState } from "react";
 
+
+
+const Profile = () => {
+ 
    return (
 
    <div className="flex flex-col lg:flex-row h-screen bg-gray-900 text-white font-sans">
@@ -39,9 +44,14 @@ const Profile = () => {
     <div className="w-10 h-10 bg-gray-700 rounded-full overflow-hidden border-4 border-blue-500">
                     <img src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=22c55e" alt="Profile" className="w-full h-full object-cover" />
                 </div>
-            <button className='ml-4'>
+                
+            <button 
+            
+            className='ml-4'>
                 View Profile
-                <MdArrowDropUp className="h-5 w-5 inline-block ml-4" />
+                <MdArrowDropUp 
+                
+                className="h-5 w-5 inline-block ml-4" />
             </button>
 
         </div>
