@@ -7,6 +7,7 @@ import Home from "./components/pages/Home.jsx";
 import './App.css';
 import Login from "./components/pages/Login.jsx";
 import Signup from "./components/pages/SignUp.jsx";
+import Profile from "./components/Profile/Profile.jsx";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
         </Route>
+            <Route path="/profile" element={<Profile />} />
 
         <Route path="/editor/:roomId" element={<EditorPage />} />
       </Routes>
