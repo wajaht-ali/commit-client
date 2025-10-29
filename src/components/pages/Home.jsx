@@ -1,7 +1,9 @@
 import { useOutletContext } from 'react-router-dom';
 import { FaCode, FaUsers, FaLaptopCode } from 'react-icons/fa';
+import { useAuth } from "../../context/AuthContext";
 
 const HomePage = () => {
+    const { user } = useAuth();
     const { toggleModal } = useOutletContext();
 
     return (
@@ -19,12 +21,21 @@ const HomePage = () => {
                         <p className="mt-6 text-gray-500">
                             Peer programming is an agile software development technique where two programmers work together at one workstation.
                         </p>
-                        <button
-                            onClick={toggleModal}
-                            className="mt-8 px-8 py-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300 hover:cursor-pointer"
-                        >
-                            Create or Join Room
-                        </button>
+                        {user?.userData ? (
+                            <button
+                                onClick={toggleModal}
+                                className="mt-8 px-8 py-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300 hover:cursor-pointer"
+                            >
+                                Create or Join Room
+                            </button>
+                        ) : (
+                            <button
+                                onClick={() => window.location.href = '/auth/login'}
+                                className="mt-8 px-8 py-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-600 transition duration-300 hover:cursor-pointer"
+                            >
+                                Sign In
+                            </button>
+                        )}
                     </div>
                     <div className="md:w-1/2 mt-12 md:mt-0 flex justify-center">
                         <FaLaptopCode className="text-9xl md:text-[12rem] text-green-400 opacity-80" />

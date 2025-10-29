@@ -1,11 +1,15 @@
 /* eslint-disable no-unused-vars */
-"use client";
 
-import { createUserWithEmailAndPassword, sendEmailVerification, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { auth, githubProvider, googleProvider } from "../../Firebase";
-import { useNavigate } from "react-router-dom";
+import { auth, githubProvider, googleProvider } from "../../Firebase.js";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -14,6 +18,7 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { setUser } = useAuth();
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -21,7 +26,12 @@ export default function Signup() {
     setError("");
     try {
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
-      await sendEmailVerification(userCred.user);
+      const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, { name, email });
+      if (!res.data.success) {
+        toast.error(res.data.message);
+        return;
+      }
+      setUser(res.data.userData);
       navigate("/");
     } catch (err) {
       setError(err.message);
@@ -34,9 +44,14 @@ export default function Signup() {
     setLoading(true);
     setError("");
     try {
-      await signInWithPopup(auth, provider);
+      const result = await signInWithPopup(auth, provider);
+      const { user } = result;
+      const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, { name: user.displayName, email: user.email });
+      
+      setUser(res.data);
       navigate("/");
     } catch (err) {
+      console.log(err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -129,7 +144,7 @@ export default function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-all duration-200 disabled:opacity-50"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 hover:cursor-pointer"
           >
             Sign Up
           </button>
@@ -140,13 +155,13 @@ export default function Signup() {
           <div className="flex justify-center gap-4">
             <button
               onClick={() => handleProviderSignup(googleProvider)}
-              className="bg-red-500/80 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all duration-200"
+              className="bg-red-500/80 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all duration-200 hover:cursor-pointer"
             >
               Google
             </button>
             <button
               onClick={() => handleProviderSignup(githubProvider)}
-              className="bg-gray-700/80 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition-all duration-200"
+              className="bg-gray-700/80 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition-all duration-200 hover:cursor-pointer"
             >
               GitHub
             </button>
@@ -155,9 +170,9 @@ export default function Signup() {
 
         <p className="mt-6 text-sm text-center text-gray-400">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-400 hover:underline">
+          <Link to="/auth/login" className="text-blue-400 hover:underline">
             Login
-          </a>
+          </Link>
         </p>
       </motion.div>
     </motion.div>

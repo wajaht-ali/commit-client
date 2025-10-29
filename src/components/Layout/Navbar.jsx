@@ -65,12 +65,14 @@ const Navbar = ({ toggleModal }) => {
                         Contact
                     </Link>
 
-                    <button
-                        onClick={toggleModal}
-                        className="px-5 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 hover:cursor-pointer active:scale-95 transition-all duration-300"
-                    >
-                        Start Now
-                    </button>
+                    {
+                        user && <button
+                            onClick={toggleModal}
+                            className="px-5 py-2 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 hover:cursor-pointer active:scale-95 transition-all duration-300"
+                        >
+                            Start Now
+                        </button>
+                    }
 
                     {!user ? (
                         <button
