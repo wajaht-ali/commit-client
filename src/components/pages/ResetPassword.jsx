@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { sendPasswordResetEmail } from "firebase/auth";
+import { auth } from "../../Firebase";
 
 export default function ResetPassword() {
     const [email, setEmail] = useState("");
@@ -16,31 +18,34 @@ export default function ResetPassword() {
         e.preventDefault();
         setLoading(true);
 
-        if (!email) {
-            toast.error('Please enter your registered email address.');
+        if (!email.trim()) {
+            toast.error("Please enter your registered email address.");
             setLoading(false);
             return;
         }
 
         try {
-            let res = await axios.post(`${API_URL}/api/v1/user/reset-password`, { email })
+            const res = await axios.post(`${API_URL}/api/v1/user/reset-password`, { email });
+
             if (res.data.success) {
-                toast.success(res.data.message || 'Password reset email sent. Please check your inbox.');
-                setTimeout(() => navigate('/auth/login'), 2000);
+                await sendPasswordResetEmail(auth, email);
+                toast.success("Password reset link sent. Check your inbox (or spam folder).");
+                setTimeout(() => navigate("/auth/login"), 2000);
             }
         } catch (err) {
-            if (err.code === 'auth/invalid-email') {
-                toast.error('Invalid email format.');
-            } else if (err.code === 'auth/user-not-found') {
-                toast.error('No account found for this email address.');
-            } else {
-                toast.error(err.response.data.message || 'Something went wrong. Please try again later.');
+            const apiMessage = err?.response?.data?.message;
+
+            switch (apiMessage) {
+                case "No account found with this email address.":
+                    toast.error(apiMessage);
+                    break;
+                default:
+                    toast.error(apiMessage || "Something went wrong. Please try again later.");
             }
         } finally {
             setLoading(false);
         }
     };
-
 
     return (
         <motion.div
