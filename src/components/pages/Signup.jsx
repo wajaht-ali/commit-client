@@ -20,6 +20,44 @@ export default function Signup() {
   const navigate = useNavigate();
   const { setUser } = useAuth();
 
+  // const handleSignup = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setError("");
+  //   try {
+  //     const userCred = await createUserWithEmailAndPassword(auth, email, password);
+  //     const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, { name, email });
+  //     if (!res.data.success) {
+  //       toast.error(res.data.message);
+  //       return;
+  //     }
+  //     setUser(res.data.userData);
+  //     navigate("/");
+  //   } catch (err) {
+  //     setError(err.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  // const handleProviderSignup = async (provider) => {
+  //   setLoading(true);
+  //   setError("");
+  //   try {
+  //     const result = await signInWithPopup(auth, provider);
+  //     const { user } = result;
+  //     const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, { name: user.displayName, email: user.email });
+
+  //     setUser(res.data);
+  //     navigate("/");
+  //   } catch (err) {
+  //     console.log(err);
+  //     setError(err.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -40,19 +78,42 @@ export default function Signup() {
     }
   };
 
+  // --- UPDATED FUNCTION LOGIC ---
   const handleProviderSignup = async (provider) => {
     setLoading(true);
     setError("");
     try {
       const result = await signInWithPopup(auth, provider);
       const { user } = result;
-      const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, { name: user.displayName, email: user.email });
-      
-      setUser(res.data);
+
+      // Call your backend to save the user, same as with other providers
+      const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, {
+        name: user.displayName,
+        email: user.email,
+      });
+
+      // Added consistency with the email signup response handling
+      if (!res.data.success) {
+        toast.error(res.data.message);
+        setError(res.data.message); // Also set the local error for display
+        return;
+      }
+
+      // Use res.data.userData to be consistent with the other signup method
+      setUser(res.data.userData);
+      toast.success("Signed up successfully!");
       navigate("/");
     } catch (err) {
-      console.log(err);
-      setError(err.message);
+      console.error("Provider signup error:", err);
+
+      // Provide a more user-friendly error for a common issue
+      if (err.code === 'auth/account-exists-with-different-credential') {
+        const errorMessage = "An account already exists with this email. Please log in with the original method.";
+        setError(errorMessage);
+        toast.error(errorMessage);
+      } else {
+        setError(err.message);
+      }
     } finally {
       setLoading(false);
     }

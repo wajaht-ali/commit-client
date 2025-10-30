@@ -119,7 +119,7 @@ export default function Login() {
           />
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 hover:cursor-pointer transition"
             disabled={loading}
           >
             Login
@@ -131,13 +131,13 @@ export default function Login() {
           <div className="flex justify-center mt-2 gap-4">
             <button
               onClick={handleGoogleLogin}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 hover:cursor-pointer"
             >
               Google
             </button>
             <button
               onClick={handleGithubLogin}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900"
+              className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 hover:cursor-pointer"
             >
               GitHub
             </button>
