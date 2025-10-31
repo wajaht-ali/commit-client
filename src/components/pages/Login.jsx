@@ -5,26 +5,43 @@ import { auth, googleProvider, githubProvider } from "../../Firebase";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
+  fetchSignInMethodsForEmail,
+  linkWithCredential,
+  GoogleAuthProvider,
+  GithubAuthProvider, 
 } from "firebase/auth";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "../../context/AuthContext";
+import axios from "axios"; 
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  
+  const { setUser } = useAuth(); 
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
       const userCred = await signInWithEmailAndPassword(auth, email, password);
-      if (!userCred.user.emailVerified) {
-        toast.error("Please verify your email before logging in.");
+
+      const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, {
+        name: userCred.user.displayName,
+        email: userCred.user.email,
+      });
+
+      if (!res.data.success) {
+        toast.error(res.data.message);
         return;
       }
+
+      setUser(res.data.userData);
       toast.success("Welcome back!");
       navigate("/");
     } catch (error) {
@@ -34,28 +51,69 @@ export default function Login() {
     }
   };
 
-  const handleGoogleLogin = async () => {
+  const handleProviderLogin = async (provider) => {
     setLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, {
+        name: user.displayName,
+        email: user.email,
+      });
+      if (!res.data.success) {
+        toast.error(res.data.message);
+        return;
+      }
+      setUser(res.data.userData);
       toast.success("Logged in successfully!");
-      setTimeout(() => navigate("/"), 300);
+      navigate("/");
     } catch (error) {
-      toast.error(error.message);
+      if (error.code === 'auth/account-exists-with-different-credential') {
+        try {
+          const pendingCred = provider.providerId === 'google.com'
+            ? GoogleAuthProvider.credentialFromError(error)
+            : GithubAuthProvider.credentialFromError(error);
+
+          const email = error.customData.email;
+          const methods = await fetchSignInMethodsForEmail(auth, email);
+          console.log("methods:", methods);
+          if (methods.length === 0) {
+            toast.error("Could not determine the original sign-in method. Please contact support or try resetting your password.", { duration: 6000 });
+            setLoading(false);
+            return;
+          }
+
+          const existingProvider = methods[0];
+          const providerToSignIn = existingProvider === 'google.com' ? googleProvider : githubProvider;
+          toast(`Please sign in with ${existingProvider === 'google.com' ? 'Google' : 'GitHub'}.`);
+          const result = await signInWithPopup(auth, providerToSignIn);
+
+          await linkWithCredential(result.user, pendingCred);
+
+          toast.success("Accounts linked! You can now sign in with either method.");
+          const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, {
+            name: result.user.displayName,
+            email: result.user.email,
+          });
+
+          if (res.data.success) {
+            setUser(res.data.userData);
+            navigate("/");
+          } else {
+            toast.error(res.data.message);
+          }
+
+        } catch (linkError) {
+          toast.error(`Could not link accounts: ${linkError.message}`);
+        }
+      } else {
+        toast.error(error.message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGithubLogin = async () => {
-    try {
-      await signInWithPopup(auth, githubProvider);
-      toast.success("Logged in successfully!");
-      setTimeout(() => navigate("/"), 300);
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
 
   return (
     <motion.div
@@ -130,13 +188,13 @@ export default function Login() {
           <p className="text-gray-400">Or login with</p>
           <div className="flex justify-center mt-2 gap-4">
             <button
-              onClick={handleGoogleLogin}
+              onClick={() => handleProviderLogin(googleProvider)}
               className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 hover:cursor-pointer"
             >
               Google
             </button>
             <button
-              onClick={handleGithubLogin}
+              onClick={() => handleProviderLogin(githubProvider)}
               className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 hover:cursor-pointer"
             >
               GitHub
