@@ -8,13 +8,16 @@ import {
   fetchSignInMethodsForEmail,
   linkWithCredential,
   GoogleAuthProvider,
-  GithubAuthProvider, 
+  GithubAuthProvider,
 } from "firebase/auth";
+import { Puff } from 'react-loader-spinner';
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
-import axios from "axios"; 
+import { FcGoogle } from "react-icons/fc";
+import { FaEye, FaEyeSlash, FaGithub } from "react-icons/fa";
+import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -22,8 +25,10 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
-  const { setUser } = useAuth(); 
+  const { setUser } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -46,6 +51,7 @@ export default function Login() {
       navigate("/");
     } catch (error) {
       toast.error(error.message);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -56,44 +62,58 @@ export default function Login() {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+
       const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, {
         name: user.displayName,
         email: user.email,
       });
+
       if (!res.data.success) {
         toast.error(res.data.message);
+        setError(res.data.message);
         return;
       }
       setUser(res.data.userData);
       toast.success("Logged in successfully!");
       navigate("/");
+
     } catch (error) {
       if (error.code === 'auth/account-exists-with-different-credential') {
         try {
-          const pendingCred = provider.providerId === 'google.com'
-            ? GoogleAuthProvider.credentialFromError(error)
-            : GithubAuthProvider.credentialFromError(error);
-
           const email = error.customData.email;
+          const pendingCred = GithubAuthProvider.credentialFromError(error);
+
           const methods = await fetchSignInMethodsForEmail(auth, email);
-          console.log("methods:", methods);
+
           if (methods.length === 0) {
-            toast.error("Could not determine the original sign-in method. Please contact support or try resetting your password.", { duration: 6000 });
+            toast.error("This email is already in use. Please sign in with your original method (e.g., Google or Password).", { duration: 5000 });
+            setError("This email is already in use. Please sign in with your original method.");
             setLoading(false);
             return;
           }
 
-          const existingProvider = methods[0];
-          const providerToSignIn = existingProvider === 'google.com' ? googleProvider : githubProvider;
-          toast(`Please sign in with ${existingProvider === 'google.com' ? 'Google' : 'GitHub'}.`);
-          const result = await signInWithPopup(auth, providerToSignIn);
+          const existingProviderId = methods[0];
+          let providerToSignIn;
 
-          await linkWithCredential(result.user, pendingCred);
+          if (existingProviderId === GoogleAuthProvider.PROVIDER_ID) {
+            providerToSignIn = googleProvider;
+            toast.info("This email is registered with Google. Please sign in with Google to link your GitHub account.");
+          } else if (existingProviderId === GithubAuthProvider.PROVIDER_ID) {
+            providerToSignIn = githubProvider;
+            toast.info("Please sign in with GitHub to continue.");
+          } else {
+            toast.error(`This email is associated with a ${existingProviderId} account. Please sign in with that method first.`);
+            setLoading(false);
+            return;
+          }
+          const authResult = await signInWithPopup(auth, providerToSignIn);
 
-          toast.success("Accounts linked! You can now sign in with either method.");
-          const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, {
-            name: result.user.displayName,
-            email: result.user.email,
+          await linkWithCredential(authResult.user, pendingCred);
+          toast.success("Accounts linked successfully! You can now sign in with either method.");
+
+          const res = await axios.post(`${API_URL}/api/v1/user/processAuthUser`, {
+            name: authResult.user.displayName,
+            email: authResult.user.email,
           });
 
           if (res.data.success) {
@@ -101,12 +121,15 @@ export default function Login() {
             navigate("/");
           } else {
             toast.error(res.data.message);
+            setError(res.data.message);
           }
-
         } catch (linkError) {
+          console.error("Account linking failed:", linkError);
           toast.error(`Could not link accounts: ${linkError.message}`);
         }
       } else {
+        console.error("Provider sign-in error:", error);
+        setError(error.message);
         toast.error(error.message);
       }
     } finally {
@@ -114,107 +137,155 @@ export default function Login() {
     }
   };
 
-
   return (
-    <motion.div
-      className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-    >
-      {/* Blur animated background */}
+    <div className="flex min-h-screen bg-[#111111]">
       <motion.div
-        className="absolute inset-0 backdrop-blur-3xl bg-white/5"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2 }}
-      />
-
-      {/* Loading Overlay */}
-      <AnimatePresence>
-        {loading && (
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="w-14 h-14 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ repeat: Infinity, duration: 1.2 }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Login Card */}
-      <motion.div
-        className="relative w-full max-w-md p-8 m-6 lg:m-auto bg-gray-700 shadow-2xl rounded-2xl backdrop-blur-lg"
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="hidden lg:flex lg:w-1/2 items-center justify-center bg-[radial-gradient(circle_at_top,_#b48eff_0%,_#6b21a8_45%,_#000000_100%)] p-12 text-white"
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
       >
-        <h2 className="text-2xl font-bold text-center mb-6 text-white">
-          Login
-        </h2>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.0, delay: 0.5 }}
+        >
+          <h2 className="text-3xl font-semibold mb-6">Build Your Commitment Through Code</h2>
+          <p className="text-lg mb-8">
+            Create your account and join us in our commitment to code.
+          </p>
+          {/* <div className="space-y-4">
+            <div className="flex items-center p-4 bg-white text-black rounded-lg shadow-lg">
+              <div className="w-8 h-8 flex items-center justify-center bg-black text-white rounded-full mr-4">1</div>
+              <span>Sign up your account</span>
+            </div>
+            <div className="flex items-center p-4 bg-gray-800 rounded-lg">
+              <div className="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full mr-4">2</div>
+              <span>Set up your workspace</span>
+            </div>
+            <div className="flex items-center p-4 bg-gray-800 rounded-lg">
+              <div className="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full mr-4">3</div>
+              <span>Set up your profile</span>
+            </div>
+          </div> */}
+        </motion.div>
+      </motion.div>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 hover:cursor-pointer transition"
-            disabled={loading}
-          >
-            Login
-          </button>
-        </form>
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative">
+        <AnimatePresence>
+          {loading && (
+            <motion.div
+              className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-md z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Puff
+                visible={true}
+                height="80"
+                width="80"
+                color="#a855f7"
+                ariaLabel="puff-loading"
+              />
+              <motion.p
+                className="mt-4 text-lg font-semibold text-white"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                Signing Up...
+              </motion.p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <div className="mt-4 text-center">
-          <p className="text-gray-400">Or login with</p>
-          <div className="flex justify-center mt-2 gap-4">
+        <motion.div
+          className="w-full max-w-md"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
+          <h2 className="text-3xl font-bold text-white mb-2">Sign In</h2>
+          <p className="text-gray-400 mb-8">Enter your personal credentials to sign in.</p>
+
+          <div className="flex gap-4 mb-6">
             <button
               onClick={() => handleProviderLogin(googleProvider)}
-              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 hover:cursor-pointer"
+              className="flex-1 py-3 px-4 flex items-center justify-center gap-2 bg-[#1f1f1f] text-white rounded-lg hover:bg-gray-800 transition-all duration-200 hover:cursor-pointer"
             >
-              Google
+              <FcGoogle /> Google
             </button>
             <button
               onClick={() => handleProviderLogin(githubProvider)}
-              className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 hover:cursor-pointer"
+              className="flex-1 py-3 px-4 flex items-center justify-center gap-2 bg-[#1f1f1f] text-white rounded-lg hover:bg-gray-800 transition-all duration-200 hover:cursor-pointer"
             >
-              GitHub
+              <FaGithub /> Github
             </button>
           </div>
-        </div>
 
-        <p className="mt-4 text-sm text-center text-gray-300">
-          Don’t have an account?{" "}
-          <Link to="/auth/signup" className="text-blue-400 hover:underline">
-            Sign Up
-          </Link>
-        </p>
-        <p className="mt-4 text-sm text-center text-gray-300">
-          Forgotten your password?{" "}
-          <Link to="/auth/reset-password" className="text-blue-400 hover:underline">
-            Reset Password
-          </Link>
-        </p>
-      </motion.div>
-    </motion.div>
+          <div className="relative flex items-center mb-6">
+            <hr className="w-full border-gray-600" />
+            <span className="absolute left-1/2 -translate-x-1/2 bg-[#111111] px-2 text-gray-400">Or</span>
+          </div>
+
+          {error && (
+            <motion.p
+              className="text-red-400 text-center my-4 text-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {error}
+            </motion.p>
+          )}
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input
+              type="email"
+              placeholder="Enter Email"
+              className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+            <div className="flex flex-row items-center justify-between">
+              <p className="text-xs text-gray-500">Must be at least 8 characters.</p>
+              <Link to="/auth/reset-password" className="text-sm text-purple-400 underline">Forgot Password?</Link>
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white text-black py-3 rounded-lg font-medium hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 hover:cursor-pointer"
+            >
+              Login
+            </button>
+          </form>
+
+          <p className="mt-6 text-sm text-center text-gray-400">
+            Don't have an account?{' '}
+            <Link to="/auth/signup" className="text-purple-400 hover:underline">
+              Sign Up
+            </Link>
+          </p>
+        </motion.div>
+      </div>
+    </div>
   );
 }

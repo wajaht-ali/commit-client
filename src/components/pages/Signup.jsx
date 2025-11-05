@@ -1,62 +1,29 @@
 /* eslint-disable no-unused-vars */
+/* eslint-disable no-unused-vars */
 
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaGithub, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FcGoogle } from "react-icons/fc";
+import { Puff } from 'react-loader-spinner';
 import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
 import { auth, githubProvider, googleProvider } from "../../Firebase.js";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
+import { useAuth } from '../../context/AuthContext.jsx';
+import toast from 'react-hot-toast';
 import axios from "axios";
-import toast from "react-hot-toast";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function Signup() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [password, setPassword] = useState("");
+const Signup = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const navigate = useNavigate();
   const { setUser } = useAuth();
-
-  // const handleSignup = async (e) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-  //   setError("");
-  //   try {
-  //     const userCred = await createUserWithEmailAndPassword(auth, email, password);
-  //     const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, { name, email });
-  //     if (!res.data.success) {
-  //       toast.error(res.data.message);
-  //       return;
-  //     }
-  //     setUser(res.data.userData);
-  //     navigate("/");
-  //   } catch (err) {
-  //     setError(err.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  // const handleProviderSignup = async (provider) => {
-  //   setLoading(true);
-  //   setError("");
-  //   try {
-  //     const result = await signInWithPopup(auth, provider);
-  //     const { user } = result;
-  //     const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, { name: user.displayName, email: user.email });
-
-  //     setUser(res.data);
-  //     navigate("/");
-  //   } catch (err) {
-  //     console.log(err);
-  //     setError(err.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const handleSignup = async (e) => {
     e.preventDefault();
@@ -78,165 +45,182 @@ export default function Signup() {
     }
   };
 
-  // --- UPDATED FUNCTION LOGIC ---
   const handleProviderSignup = async (provider) => {
     setLoading(true);
     setError("");
     try {
       const result = await signInWithPopup(auth, provider);
       const { user } = result;
-
-      // Call your backend to save the user, same as with other providers
-      const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, {
-        name: user.displayName,
-        email: user.email,
-      });
-
-      // Added consistency with the email signup response handling
-      if (!res.data.success) {
-        toast.error(res.data.message);
-        setError(res.data.message); // Also set the local error for display
-        return;
-      }
-
-      // Use res.data.userData to be consistent with the other signup method
-      setUser(res.data.userData);
-      toast.success("Signed up successfully!");
+      const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, { name: user.displayName, email: user.email });
+      setUser(res.data);
       navigate("/");
     } catch (err) {
-      console.error("Provider signup error:", err);
-
-      // Provide a more user-friendly error for a common issue
-      if (err.code === 'auth/account-exists-with-different-credential') {
-        const errorMessage = "An account already exists with this email. Please log in with the original method.";
-        setError(errorMessage);
-        toast.error(errorMessage);
-      } else {
-        setError(err.message);
-      }
+      console.log(err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <motion.div
-      className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-800 via-gray-900 to-black overflow-hidden"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.8 }}
-    >
-      {/* Blur animated background */}
+    <div className="flex min-h-screen bg-[#111111]">
       <motion.div
-        className="absolute inset-0 backdrop-blur-3xl bg-white/5"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2 }}
-      />
-
-      {/* Loading Popper */}
-      <AnimatePresence>
-        {loading && (
-          <motion.div
-            className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              className="w-14 h-14 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ repeat: Infinity, duration: 1.2 }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Signup card */}
-      <motion.div
-        className="relative w-full max-w-md p-8 bg-gray-800/70 shadow-2xl rounded-2xl backdrop-blur-lg"
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="hidden lg:flex lg:w-1/2 items-center justify-center bg-[radial-gradient(circle_at_top,_#b48eff_0%,_#6b21a8_45%,_#000000_100%)] p-12 text-white"
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
       >
-        <h2 className="text-3xl font-semibold text-center mb-6 text-white tracking-tight">
-          Create your account
-        </h2>
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.0, delay: 0.5 }}
+        >
+          <h2 className="text-3xl font-semibold mb-6">Build Your Commitment Through Code</h2>
+          <p className="text-lg mb-8">
+            Create your account and join us in our commitment to code.
+          </p>
+          {/* <div className="space-y-4">
+            <div className="flex items-center p-4 bg-white text-black rounded-lg shadow-lg">
+              <div className="w-8 h-8 flex items-center justify-center bg-black text-white rounded-full mr-4">1</div>
+              <span>Sign up your account</span>
+            </div>
+            <div className="flex items-center p-4 bg-gray-800 rounded-lg">
+              <div className="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full mr-4">2</div>
+              <span>Set up your workspace</span>
+            </div>
+            <div className="flex items-center p-4 bg-gray-800 rounded-lg">
+              <div className="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full mr-4">3</div>
+              <span>Set up your profile</span>
+            </div>
+          </div> */}
+        </motion.div>
+      </motion.div>
 
-        {error && (
-          <motion.p
-            className="text-red-400 text-center mb-4 text-sm"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            {error}
-          </motion.p>
-        )}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative">
+        <AnimatePresence>
+          {loading && (
+            <motion.div
+              className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-md z-50"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <Puff
+                visible={true}
+                height="80"
+                width="80"
+                color="#a855f7"
+                ariaLabel="puff-loading"
+              />
+              <motion.p
+                className="mt-4 text-lg font-semibold text-white"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                Signing Up...
+              </motion.p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        <form onSubmit={handleSignup} className="space-y-4">
-          <input
-            type="text"
-            placeholder="Full Name"
-            className="w-full p-3 bg-gray-900/50 text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+        <motion.div
+          className="w-full max-w-md"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
+          <h2 className="text-3xl font-bold text-white mb-2">Sign Up Account</h2>
+          <p className="text-gray-400 mb-8">Enter your personal data to create your account.</p>
 
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full p-3 bg-gray-900/50 text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            className="w-full p-3 bg-gray-900/50 text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 hover:cursor-pointer"
-          >
-            Sign Up
-          </button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-gray-400 mb-2 text-sm">or sign up with</p>
-          <div className="flex justify-center gap-4">
+          <div className="flex gap-4 mb-6">
             <button
               onClick={() => handleProviderSignup(googleProvider)}
-              className="bg-red-500/80 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-all duration-200 hover:cursor-pointer"
+              className="flex-1 py-3 px-4 flex items-center justify-center gap-2 bg-[#1f1f1f] text-white rounded-lg hover:bg-gray-800 transition-all duration-200 hover:cursor-pointer"
             >
-              Google
+              <FcGoogle /> Google
             </button>
             <button
               onClick={() => handleProviderSignup(githubProvider)}
-              className="bg-gray-700/80 hover:bg-gray-900 text-white px-4 py-2 rounded-lg transition-all duration-200 hover:cursor-pointer"
+              className="flex-1 py-3 px-4 flex items-center justify-center gap-2 bg-[#1f1f1f] text-white rounded-lg hover:bg-gray-800 transition-all duration-200 hover:cursor-pointer"
             >
-              GitHub
+              <FaGithub /> Github
             </button>
           </div>
-        </div>
 
-        <p className="mt-6 text-sm text-center text-gray-400">
-          Already have an account?{" "}
-          <Link to="/auth/login" className="text-blue-400 hover:underline">
-            Login
-          </Link>
-        </p>
-      </motion.div>
-    </motion.div>
+          <div className="relative flex items-center mb-6">
+            <hr className="w-full border-gray-600" />
+            <span className="absolute left-1/2 -translate-x-1/2 bg-[#111111] px-2 text-gray-400">Or</span>
+          </div>
+
+          {error && (
+            <motion.p
+              className="text-red-400 text-center my-4 text-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {error}
+            </motion.p>
+          )}
+
+          <form onSubmit={handleSignup} className="space-y-4">
+            <div className="flex gap-4">
+              <input
+                type="text"
+                placeholder="Enter Name"
+                className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
+            <input
+              type="email"
+              placeholder="Enter Email"
+              className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
+            <p className="text-xs text-gray-500">Must be at least 8 characters.</p>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-white text-black py-3 rounded-lg font-medium hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 hover:cursor-pointer"
+            >
+              Sign Up
+            </button>
+          </form>
+
+          <p className="mt-6 text-sm text-center text-gray-400">
+            Already have an account?{' '}
+            <Link to="/auth/login" className="text-purple-400 hover:underline">
+              Log in
+            </Link>
+          </p>
+        </motion.div>
+      </div>
+    </div>
   );
-}
+};
 
+export default Signup;
