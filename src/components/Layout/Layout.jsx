@@ -1,24 +1,44 @@
 import React, { useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import RoomModal from '../ui/RoomModal';
 
 const Layout = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [user, setUser] = useState(null);
+
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
     };
 
-    return (
-        <div className="bg-gray-900 text-white min-h-screen">
-            <Navbar toggleModal={toggleModal} />
-            <main>
-                <Outlet context={{ toggleModal }} />
-            </main>
-            <Footer />
+    const handleLogout = () => {
+        setUser(null);
+        console.log("User logged out");
+    };
 
-            {isModalOpen && <RoomModal toggleModal={toggleModal} />}
+    return (
+        <div className="bg-slate-900 text-slate-200 min-h-screen">
+            <Navbar
+                user={user}
+                toggleModal={toggleModal}
+                handleLogout={handleLogout}
+            />
+
+            <main>
+                <Outlet context={{ user, toggleModal }} />
+            </main>
+
+            <Footer />
+            <AnimatePresence>
+                {isModalOpen && (
+                    <RoomModal
+                        isVisible={isModalOpen}
+                        toggleModal={toggleModal}
+                    />
+                )}
+            </AnimatePresence>
         </div>
     );
 };
