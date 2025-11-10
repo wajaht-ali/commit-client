@@ -37,7 +37,7 @@ const Signup = () => {
         return;
       }
       setUser(res.data.userData);
-      navigate("/");
+      window.location.replace("/");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -53,7 +53,7 @@ const Signup = () => {
       const { user } = result;
       const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, { name: user.displayName, email: user.email });
       setUser(res.data);
-      navigate("/");
+      window.location.replace("/");
     } catch (err) {
       console.log(err);
       setError(err.message);
@@ -65,7 +65,7 @@ const Signup = () => {
   return (
     <div className="flex min-h-screen bg-[#111111]">
       <motion.div
-        className="hidden lg:flex lg:w-1/2 items-center justify-center bg-[radial-gradient(circle_at_top,_#b48eff_0%,_#6b21a8_45%,_#000000_100%)] p-12 text-white"
+        className="hidden lg:flex lg:w-1/2 items-center justify-center bg-[radial-gradient(circle_at_top,#38bdf8_0%,#0284c7_45%,_#000000_100%)] p-12 text-white"
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8 }}
@@ -80,19 +80,19 @@ const Signup = () => {
             Create your account and join us in our commitment to code.
           </p>
           {/* <div className="space-y-4">
-            <div className="flex items-center p-4 bg-white text-black rounded-lg shadow-lg">
-              <div className="w-8 h-8 flex items-center justify-center bg-black text-white rounded-full mr-4">1</div>
-              <span>Sign up your account</span>
-            </div>
-            <div className="flex items-center p-4 bg-gray-800 rounded-lg">
-              <div className="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full mr-4">2</div>
-              <span>Set up your workspace</span>
-            </div>
-            <div className="flex items-center p-4 bg-gray-800 rounded-lg">
-              <div className="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full mr-4">3</div>
-              <span>Set up your profile</span>
-            </div>
-          </div> */}
+      <div className="flex items-center p-4 bg-white text-black rounded-lg shadow-lg">
+        <div className="w-8 h-8 flex items-center justify-center bg-black text-white rounded-full mr-4">1</div>
+        <span>Sign up your account</span>
+      </div>
+      <div className="flex items-center p-4 bg-gray-800 rounded-lg">
+        <div className="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full mr-4">2</div>
+        <span>Set up your workspace</span>
+      </div>
+      <div className="flex items-center p-4 bg-gray-800 rounded-lg">
+        <div className="w-8 h-8 flex items-center justify-center bg-gray-700 rounded-full mr-4">3</div>
+        <span>Set up your profile</span>
+      </div>
+    </div> */}
         </motion.div>
       </motion.div>
 
@@ -110,7 +110,7 @@ const Signup = () => {
                 visible={true}
                 height="80"
                 width="80"
-                color="#a855f7"
+                color="#1598D8"
                 ariaLabel="puff-loading"
               />
               <motion.p
@@ -169,7 +169,7 @@ const Signup = () => {
               <input
                 type="text"
                 placeholder="Enter Name"
-                className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -178,7 +178,7 @@ const Signup = () => {
             <input
               type="email"
               placeholder="Enter Email"
-              className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-sky-500 focus:outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -187,7 +187,7 @@ const Signup = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -213,7 +213,7 @@ const Signup = () => {
 
           <p className="mt-6 text-sm text-center text-gray-400">
             Already have an account?{' '}
-            <Link to="/auth/login" className="text-purple-400 hover:underline">
+            <Link to="/auth/login" className="text-sky-400 hover:underline">
               Log in
             </Link>
           </p>

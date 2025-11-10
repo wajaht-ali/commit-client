@@ -48,7 +48,7 @@ export default function Login() {
 
       setUser(res.data.userData);
       toast.success("Welcome back!");
-      navigate("/");
+      window.location.replace("/");
     } catch (error) {
       toast.error(error.message);
       setError(error.message);
@@ -75,8 +75,7 @@ export default function Login() {
       }
       setUser(res.data.userData);
       toast.success("Logged in successfully!");
-      navigate("/");
-
+      window.location.replace("/");
     } catch (error) {
       if (error.code === 'auth/account-exists-with-different-credential') {
         try {
@@ -140,7 +139,7 @@ export default function Login() {
   return (
     <div className="flex min-h-screen bg-[#111111]">
       <motion.div
-        className="hidden lg:flex lg:w-1/2 items-center justify-center bg-[radial-gradient(circle_at_top,_#b48eff_0%,_#6b21a8_45%,_#000000_100%)] p-12 text-white"
+        className="hidden lg:flex lg:w-1/2 items-center justify-center bg-[radial-gradient(circle_at_top,#38bdf8_0%,#0284c7_45%,_#000000_100%)] p-12 text-white"
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.8 }}
@@ -185,7 +184,7 @@ export default function Login() {
                 visible={true}
                 height="80"
                 width="80"
-                color="#a855f7"
+                color="#1598D8"
                 ariaLabel="puff-loading"
               />
               <motion.p
@@ -194,7 +193,7 @@ export default function Login() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
               >
-                Signing Up...
+                Signing In...
               </motion.p>
             </motion.div>
           )}
@@ -243,7 +242,7 @@ export default function Login() {
             <input
               type="email"
               placeholder="Enter Email"
-              className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-sky-500 focus:outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -252,7 +251,7 @@ export default function Login() {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="w-full p-3 bg-[#1f1f1f] text-white rounded-lg border border-gray-700 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -267,7 +266,7 @@ export default function Login() {
             </div>
             <div className="flex flex-row items-center justify-between">
               <p className="text-xs text-gray-500">Must be at least 8 characters.</p>
-              <Link to="/auth/reset-password" className="text-sm text-purple-400 underline">Forgot Password?</Link>
+              <Link to="/auth/reset-password" className="text-sm text-sky-400 underline">Forgot Password?</Link>
             </div>
             <button
               type="submit"
@@ -280,7 +279,7 @@ export default function Login() {
 
           <p className="mt-6 text-sm text-center text-gray-400">
             Don't have an account?{' '}
-            <Link to="/auth/signup" className="text-purple-400 hover:underline">
+            <Link to="/auth/signup" className="text-sky-400 hover:underline">
               Sign Up
             </Link>
           </p>
