@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { auth, googleProvider, githubProvider } from "../../Firebase";
 import {
@@ -12,11 +11,11 @@ import {
 } from "firebase/auth";
 import { Puff } from 'react-loader-spinner';
 import { Link, useNavigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
 import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash, FaGithub } from "react-icons/fa";
+import toast from "react-hot-toast";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;

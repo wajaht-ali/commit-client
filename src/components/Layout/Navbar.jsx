@@ -50,13 +50,13 @@ const Navbar = ({ toggleModal }) => {
                             </div>
 
                             <div className="hidden md:flex items-center gap-x-8">
-                                <Link to="/#features" className="text-slate-300 hover:text-sky-400 transition-colors duration-300">
+                                <Link to="/features" className="text-slate-300 hover:text-sky-400 transition-colors duration-300">
                                     Features
                                 </Link>
-                                <Link to="/#about" className="text-slate-300 hover:text-sky-400 transition-colors duration-300">
+                                <Link to="/about-us" className="text-slate-300 hover:text-sky-400 transition-colors duration-300">
                                     About Us
                                 </Link>
-                                <Link to="/#contact" className="text-slate-300 hover:text-sky-400 transition-colors duration-300">
+                                <Link to="/contact-us" className="text-slate-300 hover:text-sky-400 transition-colors duration-300">
                                     Contact
                                 </Link>
                             </div>
