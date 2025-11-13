@@ -2,19 +2,26 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { FaCopy } from 'react-icons/fa';
-import Editor from '@monaco-editor/react';
-import toast from 'react-hot-toast';
+import { FaChevronLeft, FaChevronRight, FaBars, FaCopy } from 'react-icons/fa';
 import { useSocket } from '../../../context/SocketContext.jsx';
-import { defaultCodeTemplates, monacoLanguageMap, UserAvatar } from '../../../utils/Utilities.jsx';
-import { copyRoomId } from '../../../utils/Utilities.jsx';
+import { defaultCodeTemplates } from '../../../utils/Utilities.jsx';
 import { languageOptions } from '../../../utils/Utilities.jsx';
-import axios from 'axios';
-import AiAssistantModal from '../../ui/AiAssistantModal.jsx';
-import VoiceControls from '../../../voice/VoiceControls.jsx';
-import RemoteAudioGrid from '../../../voice/RemoteAudioGrid.jsx';
+import { useMediaQuery } from '../../../context/QueriesContext.jsx';
 import { useVoiceCall } from '../../../voice/useVoiceCall.js';
+import { motion, AnimatePresence } from 'framer-motion';
+import AiAssistantModal from '../../ui/AiAssistantModal.jsx';
 
+import Sidebar from './Sidebar.jsx';
+import TopBar from './Topbar.jsx';
+import OutputPanel from './OutputPanel.jsx';
+import EditorPanel from './EditorPanel.jsx';
+import {
+  Panel,
+  PanelGroup,
+  PanelResizeHandle,
+} from "react-resizable-panels";
+import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const EditorPage = () => {
   const { roomId } = useParams();
@@ -27,6 +34,7 @@ const EditorPage = () => {
   const [language, setLanguage] = useState(() => {
     return localStorage.getItem('selectedLanguage') || 'javascript';
   });
+
   const [connectedUsers, setConnectedUsers] = useState([]);
   const [code, setCode] = useState(``);
   const [output, setOutput] = useState('');
@@ -34,6 +42,21 @@ const EditorPage = () => {
   const [aiPrompt, setAiPrompt] = useState('');
   const [generatedCode, setGeneratedCode] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const sidebarPanelRef = useRef(null);
+  const isMobile = useMediaQuery('(max-width: 1023px)');
+
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const toggleSidebar = () => {
+    const panel = sidebarPanelRef.current;
+    if (panel) {
+      if (isSidebarCollapsed) {
+        panel.expand();
+      } else {
+        panel.collapse();
+      }
+    }
+  };
 
   const isRoomCreator = connectedUsers[0]?.socketId === socket?.id;
   const BASE_URI = import.meta.env.VITE_API_URL;
@@ -235,183 +258,139 @@ const EditorPage = () => {
 
   if (!socket) {
     return (
-      <div className="flex h-screen w-full items-center justify-center bg-gray-900 text-white">
-        Connecting to the collaboration server...
+      <div className="flex h-screen w-full items-center justify-center bg-[#0d1117] text-white">
+        Connecting...
+      </div>
+    );
+  }
+
+  const sidebarProps = {
+    roomId,
+    connectedUsers,
+    leaveRoom,
+    voiceProps: {
+      callActive, joined, muted, isRoomCreator,
+      startCall, joinCall, leaveCall, toggleMute,
+      errors: voiceError, remoteStreams
+    }
+  };
+
+  const topBarProps = {
+    language,
+    handleLanguageChange,
+    runCode,
+    setIsAiModalOpen,
+  };
+
+  const editorPanelProps = {
+    language,
+    code,
+    handleEditorChange,
+  };
+
+  const aiModalProps = {
+    isOpen: isAiModalOpen,
+    prompt: aiPrompt,
+    setPrompt: setAiPrompt,
+    isGenerating: isGenerating,
+    generatedCode: generatedCode,
+    onGenerate: handleGenerateCode,
+    onInsert: insertGeneratedCode,
+    onClose: () => setIsAiModalOpen(false),
+  };
+
+  if (!isMobile) {
+    return (
+      <div className="h-screen bg-[#0d1117] text-[#c9d1d9] font-sans">
+        <PanelGroup direction="horizontal">
+          <Panel
+            ref={sidebarPanelRef}
+            collapsible={true}
+            onCollapse={() => setSidebarCollapsed(true)}
+            onExpand={() => setSidebarCollapsed(false)}
+            defaultSize={20}
+            minSize={20}
+            maxSize={20}
+            collapsedSize={0}
+          >
+            <Sidebar isCollapsed={isSidebarCollapsed} {...sidebarProps} />
+          </Panel>
+          <PanelResizeHandle className="relative w-1.5 bg-[#161b22] hover:bg-blue-600 transition-colors">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <button
+                onClick={toggleSidebar}
+                className="z-10 w-6 h-6 bg-neutral-700 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer"
+                title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+              >
+                {isSidebarCollapsed ? <FaChevronRight size={10} /> : <FaChevronLeft size={10} />}
+              </button>
+            </div>
+          </PanelResizeHandle>
+          <Panel defaultSize={80} minSize={30}>
+            <main className="flex-1 flex flex-col p-4 gap-4 h-full overflow-hidden">
+              <TopBar {...topBarProps} />
+              <PanelGroup direction="vertical" className="flex-1 min-h-0">
+                <Panel defaultSize={65} minSize={20}>
+                  <EditorPanel {...editorPanelProps} />
+                </Panel>
+                <PanelResizeHandle className="h-1 bg-[#30363d] hover:bg-blue-500 transition-colors" />
+                <Panel defaultSize={35} minSize={10}>
+                  <OutputPanel output={output} />
+                </Panel>
+              </PanelGroup>
+            </main>
+          </Panel>
+        </PanelGroup>
+        <AiAssistantModal {...aiModalProps} />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-gray-900 text-white font-sans">
-
-      <aside className="w-full lg:w-64 bg-gray-800 p-4 flex flex-col shrink-0">
-        <div className="flex flex-row lg:flex-col justify-between items-center lg:items-start mb-4 border-b border-gray-600 pb-2">
-          <h1 className="text-2xl font-bold">Commit</h1>
-
-          <div className="block md:hidden items-center space-x-2 bg-gray-900 rounded-md px-2 py-1">
-            <span className="text-gray-400 text-xs sm:text-sm">Room:</span>
-            <span className="font-mono text-green-400 text-xs sm:text-sm peer" onClick={() => copyRoomId(roomId)}>{roomId}</span>
-            <button
-              onClick={() => copyRoomId(roomId)}
-              title="Copy Room ID"
-              className="text-gray-400 hover:text-white transition-colors cursor-pointer peer-hover:text-white peer-hover:cursor-default"
-            >
-              <FaCopy size={12} />
-            </button>
-          </div>
-        </div>
-
-        {/* Voice Section */}
-        <section className="mt-4">
-          <h2 className="text-md lg:text-lg font-semibold mb-2">Voice</h2>
-
-          {/* Voice Controls - simplified, clean card style */}
-          <div className=" bg-gray-900 border border-gray-700 rounded-md p-3 mb-2">
-            <VoiceControls
-              callActive={callActive}
-              joined={joined}
-              muted={muted}
-              isRoomCreator={isRoomCreator}
-              onStart={startCall}
-              onJoin={joinCall}
-              onLeave={leaveCall}
-              onToggleMute={toggleMute}
+    <div className="h-screen bg-[#0d1117] text-[#c9d1d9] font-sans flex flex-col">
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 bg-black/60 z-40"
             />
-          </div>
-
-          {voiceError && (
-            <p className="text-red-400 text-xs mt-2">{voiceError}</p>
-          )}
-
-          {/* Audio Streams (hidden visually, handled internally) */}
-          <RemoteAudioGrid
-            remoteStreams={remoteStreams}
-            connectedUsers={connectedUsers}
-          />
-        </section>
-
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <h2 className="text-md lg:text-lg font-semibold mb-2">Connected Users ({connectedUsers.length})</h2>
-
-          <div className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-y-auto pb-2">
-            {connectedUsers.map((user) => (
-              <div
-                key={user.socketId}
-                className="flex items-center gap-2 bg-gray-900/60 rounded-md px-2 py-1"
-              >
-                {/* Avatar with call status indicator */}
-                <div className="relative">
-                  <UserAvatar username={user.username} />
-                  {user.inVoiceCall && (
-                    <span
-                      className="absolute bottom-0 right-0 bg-green-500 border-2 border-gray-800 rounded-full p-[3px]"
-                      title="In Voice Call"
-                    >
-                      <FaMicrophone size={8} className="text-white" />
-                    </span>
-                  )}
-                </div>
-                <span className="text-xs lg:text-sm">{user.username}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="mt-auto">
-          <button onClick={leaveRoom} className="w-auto lg:w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded transition-colors mt-4 lg:mt-0 hover:cursor-pointer">
-            Leave Room
-          </button>
-        </div>
-      </aside>
-
-      <main className="flex-1 flex flex-col p-4 gap-4 overflow-hidden">
-        <div className="flex items-center justify-between bg-gray-800 rounded-md px-3 py-2 space-x-2 sm:flex-nowrap">
-
-          <div className="hidden md:flex items-center space-x-2 bg-gray-900 rounded-md px-2 py-1">
-            <span className="text-gray-400 text-xs sm:text-sm">Room:</span>
-            <span className="font-mono text-green-400 text-xs sm:text-sm peer" onClick={() => copyRoomId(roomId)}>{roomId}</span>
-            <button
-              onClick={() => copyRoomId(roomId)}
-              title="Copy Room ID"
-              className="text-gray-400 hover:text-white transition-colors cursor-pointer peer-hover:text-white peer-hover:cursor-default"
+            <motion.div
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="fixed top-0 left-0 h-full w-full max-w-xs z-50"
             >
-              <FaCopy size={12} />
-            </button>
+              <Sidebar
+                isMobile
+                onClose={() => setMobileMenuOpen(false)}
+                {...sidebarProps}
+              />
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      <main className="flex-1 flex flex-col p-2 sm:p-4 gap-4 overflow-hidden">
+        <TopBar
+          isMobile
+          onMenuClick={() => setMobileMenuOpen(true)}
+          {...topBarProps}
+        />
+        <div className="flex-1 flex flex-col gap-4 min-h-0">
+          <div className="flex-1 min-h-0">
+            <EditorPanel {...editorPanelProps} />
           </div>
-
-          <div className="relative flex-shrink-0">
-            <select
-              value={language}
-              onChange={handleLanguageChange}
-              className="bg-[#1e1e1e] text-gray-200 font-mono text-xs sm:text-sm border border-gray-700 rounded-md 
-                 px-3 py-1 pr-8 appearance-none cursor-pointer transition-all 
-                 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500
-                 hover:border-gray-500 hover:bg-[#252526]"
-            >
-              {languageOptions.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs">
-              ▼
-            </span>
-          </div>
-
-          <button
-            onClick={() => setIsAiModalOpen(true)}
-            className="ml-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs sm:text-sm py-1 px-3 rounded transition-colors hover:cursor-pointer flex items-center"
-            title="Generate code with AI"
-          >
-            <span role="img" aria-label="sparkles" className="mr-2">✨</span>
-            Ask AI
-          </button>
-
-          <button
-            onClick={runCode}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold text-xs sm:text-sm py-1 px-3 rounded transition-colors hover:cursor-pointer"
-          >
-            Run
-          </button>
-        </div>
-
-        <div className="flex-1 grid grid-rows-2 lg:grid-rows-1 lg:grid-cols-2 gap-4 min-h-0">
-          <div className="bg-gray-800 rounded-lg overflow-hidden h-full">
-            <Editor
-              height="100%"
-              theme="vs-dark"
-              language={monacoLanguageMap[language] || "javascript"}
-              value={code}
-              onChange={handleEditorChange}
-              options={{
-                fontSize: 14,
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                automaticLayout: true,
-              }} />
-          </div>
-          <div className="bg-gray-800 rounded-lg flex flex-col h-full">
-            <div className="p-3 bg-gray-700 rounded-t-lg">
-              <h3 className="font-semibold">Output</h3>
-            </div>
-            <pre className="flex-1 p-4 bg-black text-white text-sm whitespace-pre-wrap overflow-y-auto font-mono">
-              {output}
-            </pre>
+          <div className="flex-1 min-h-0">
+            <OutputPanel output={output} />
           </div>
         </div>
       </main>
-
-      <AiAssistantModal
-        isOpen={isAiModalOpen}
-        prompt={aiPrompt}
-        setPrompt={setAiPrompt}
-        isGenerating={isGenerating}
-        generatedCode={generatedCode}
-        onGenerate={handleGenerateCode}
-        onInsert={insertGeneratedCode}
-        onClose={() => setIsAiModalOpen(false)}
-      />
+      <AiAssistantModal {...aiModalProps} />
     </div>
   );
 }

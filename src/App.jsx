@@ -7,11 +7,11 @@ import Login from "./components/pages/Login.jsx";
 import Signup from "./components/pages/Signup.jsx";
 import Profile from "./components/Profile/Profile.jsx";
 import ResetPassword from "./components/pages/ResetPassword.jsx";
-import './App.css';
 import AboutUs from "./components/pages/About.jsx";
 import NotFoundPage from "./components/Layout/NotFound.jsx";
 import FeaturesPage from "./components/pages/Features.jsx";
 import ContactUsPage from "./components/pages/Contact.jsx";
+import './App.css';
 
 function App() {
   return (

@@ -5,20 +5,16 @@ import { RTC_CONFIG } from "../utils/Utilities.jsx";
 
 function createPeerConnection(localStream, onTrack, onIce) {
   const pc = new RTCPeerConnection(RTC_CONFIG);
-
   if (localStream) {
     localStream.getTracks().forEach((t) => pc.addTrack(t, localStream));
   }
-
   pc.ontrack = (evt) => {
     const [stream] = evt.streams;
     if (stream) onTrack(stream);
   };
-
   pc.onicecandidate = (evt) => {
     if (evt.candidate) onIce(evt.candidate);
   };
-
   return pc;
 }
 
@@ -54,34 +50,45 @@ export function useVoiceCall({ socket, roomId, isRoomCreator }) {
     );
   }, []);
 
-  const startCall = useCallback(() => {
-    socket.emit("voice:start", { roomId });
-  }, [socket, roomId]);
+  const ensureLocalStream = useCallback(async () => {
+    if (localStreamRef.current) return;
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false,
+    });
 
-  const joinCall = useCallback(async () => {
+    stream.getAudioTracks().forEach((t) => (t.enabled = true));
+    localStreamRef.current = stream;
+    setMuted(false);
+  }, []);
+
+  const startCall = useCallback(async () => {
     try {
-      if (!localStreamRef.current) {
-        localStreamRef.current = await navigator.mediaDevices.getUserMedia({
-          audio: true,
-          video: false,
-        });
-        localStreamRef.current
-          .getAudioTracks()
-          .forEach((t) => (t.enabled = true));
-        setMuted(false);
-      }
+      await ensureLocalStream();
+
+      socket.emit("voice:start", { roomId });
       socket.emit("voice:join", { roomId });
       setJoined(true);
     } catch (err) {
       console.error(err);
       setErrors(err.message || "Failed to access microphone");
     }
-  }, [socket, roomId]);
+  }, [socket, roomId, ensureLocalStream]);
+
+  const joinCall = useCallback(async () => {
+    try {
+      await ensureLocalStream();
+      socket.emit("voice:join", { roomId });
+      setJoined(true);
+    } catch (err) {
+      console.error(err);
+      setErrors(err.message || "Failed to access microphone");
+    }
+  }, [socket, roomId, ensureLocalStream]);
 
   const leaveCall = useCallback(() => {
     socket.emit("voice:leave", { roomId });
     setJoined(false);
-
     peersRef.current.forEach((pc, id) => {
       try {
         pc.getSenders().forEach((s) => s.track && s.track.stop());
@@ -113,7 +120,6 @@ export function useVoiceCall({ socket, roomId, isRoomCreator }) {
 
   useEffect(() => {
     if (!socket) return;
-
     const onStarted = () => setCallActive(true);
     const onEnded = () => {
       setCallActive(false);
@@ -160,7 +166,6 @@ export function useVoiceCall({ socket, roomId, isRoomCreator }) {
           })
       );
       peersRef.current.set(fromId, pc);
-
       try {
         await pc.setRemoteDescription(new RTCSessionDescription(sdp));
         const answer = await pc.createAnswer();
@@ -243,7 +248,7 @@ export function useVoiceCall({ socket, roomId, isRoomCreator }) {
         console.error("Error stopping tracks:", err);
       }
     };
-  }, []);
+  }, [leaveCall]);
 
   return {
     callActive,
