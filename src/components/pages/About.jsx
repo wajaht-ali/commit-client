@@ -130,7 +130,7 @@ const AboutUs = () => {
                         whileTap={{ scale: 0.95 }}
                     >
                         <Link
-                            to="/editor"
+                            to="/home"
                             className="inline-block bg-blue-600 text-white font-semibold py-3 px-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
                         >
                             Go to Editor

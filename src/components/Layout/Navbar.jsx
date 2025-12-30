@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { FaLaptopCode, FaBars, FaTimes, FaChevronDown } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { useAuth } from "../../context/AuthContext";
 import { auth } from "../../Firebase";
@@ -50,15 +50,33 @@ const Navbar = ({ toggleModal }) => {
                             </div>
 
                             <div className="hidden md:flex items-center gap-x-8">
-                                <Link to="/features" className="text-slate-300 hover:text-sky-400 transition-colors duration-300">
+                                {/* <Link to="/features" className="text-slate-300 hover:text-sky-400 transition-colors duration-300">
                                     Features
-                                </Link>
-                                <Link to="/about-us" className="text-slate-300 hover:text-sky-400 transition-colors duration-300">
+                                </Link> */}
+                                <NavLink
+                                    to="/features"
+                                    className={({ isActive }) =>
+                                        `transition-colors duration-300 hover:text-sky-400 ${isActive ? "text-sky-400" : "text-slate-300"
+                                        }`
+                                    }>
+                                    Features
+                                </NavLink>
+                                <NavLink
+                                    to="/about-us"
+                                    className={({ isActive }) =>
+                                        `transition-colors duration-300 hover:text-sky-400 ${isActive ? "text-sky-400" : "text-slate-300"
+                                        }`
+                                    }>
                                     About Us
-                                </Link>
-                                <Link to="/contact-us" className="text-slate-300 hover:text-sky-400 transition-colors duration-300">
+                                </NavLink>
+                                <NavLink
+                                    to="/contact-us"
+                                    className={({ isActive }) =>
+                                        `transition-colors duration-300 hover:text-sky-400 ${isActive ? "text-sky-400" : "text-slate-300"
+                                        }`
+                                    }>
                                     Contact
-                                </Link>
+                                </NavLink>
                             </div>
 
                             <div className="hidden md:flex items-center gap-x-4">
@@ -95,7 +113,7 @@ const Navbar = ({ toggleModal }) => {
                                     </div>
                                 ) : (
                                     <>
-                                        <button onClick={() => navigate("/auth/login")} className="px-5 py-2 text-sm font-semibold text-slate-200 bg-slate-700/50 border border-slate-600 rounded-full hover:bg-slate-700 hover:cursor-pointer transition-colors duration-300">
+                                        <button onClick={() => navigate("/")} className="px-5 py-2 text-sm font-semibold text-slate-200 bg-slate-700/50 border border-slate-600 rounded-full hover:bg-slate-700 hover:cursor-pointer transition-colors duration-300">
                                             Enterprise
                                         </button>
                                         <button onClick={() => navigate("/auth/login")} className="px-5 py-2 text-sm font-semibold text-white rounded-full transition-colors duration-300 hover:cursor-pointer bg-gradient-to-r from-sky-400 to-sky-600">
