@@ -1,7 +1,7 @@
 import { FaLaptopCode } from "react-icons/fa";
 import { RxDashboard } from "react-icons/rx";
 import { MdArrowDropUp } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 const Profile = () => {
     const router = useNavigate();
@@ -23,25 +23,31 @@ const Profile = () => {
                 <nav className="flex-1">
                     <ul className="space-y-2">
                         <li>
-                            <a href="#" className="block p-2 rounded-lg hover:bg-gray-700">
+                            {/* Demo active class nav link */}
+                            {/* <NavLink href="#" className={({ isActive }) => isActive ? "block p-2 rounded-lg hover:bg-gray-700" : ""}>
                                 {" "}
                                 <RxDashboard className="h-5 w-5 inline-block mr-2" />
                                 Dashboard
-                            </a>
+                            </NavLink> */}
+                            <NavLink href="#" className={({ isActive }) => isActive ? "block p-2 rounded-lg hover:bg-gray-700" : ""}>
+                                {" "}
+                                <RxDashboard className="h-5 w-5 inline-block mr-2" />
+                                Dashboard
+                            </NavLink>
                         </li>
                         <li>
-                            <a href="#" className="block p-2 rounded-lg hover:bg-gray-700">
+                            <NavLink href="#" className={({ isActive }) => isActive ? "block p-2 rounded-lg hover:bg-gray-700" : ""}>
                                 Organization
-                            </a>
+                            </NavLink>
                         </li>
                         <li>
-                            <a href="#" className="block p-2 rounded-lg hover:bg-gray-700">
+                            <NavLink href="#" className={({ isActive }) => isActive ? "block p-2 rounded-lg hover:bg-gray-700" : ""}>
                                 Logout
-                            </a>
+                            </NavLink>
                         </li>
                     </ul>
                 </nav>
-                {/* Profile button with dropup of logout button and settings and password change */}
+
                 <div className="mt-4 flex  items-center w-full  bg-slate-800/50 backdrop-blur-lg border border-slate-700/80 rounded-lg text-white px-4 py-2 rounded-lg">
                     <div className="w-10 h-10 bg-gray-700 rounded-full overflow-hidden border-4 border-blue-500">
                         <img
@@ -65,7 +71,7 @@ const Profile = () => {
             </aside>
 
             <main className="flex-1 flex flex-col p-4 gap-4 overflow-hidden">
-                <header className="flex items-center justify-between mb-2  bg-slate-800/50 backdrop-blur-lg border border-slate-700/80 rounded-[40px] p-4 rounded-xl">
+                <header className="flex items-center justify-between mb-2  bg-slate-800/50 backdrop-blur-lg border border-slate-700/80 rounded-[40px] p-4">
                     <input
                         type="text"
                         placeholder="Search..."
@@ -96,7 +102,7 @@ const Profile = () => {
                         </div>
                     </div>
                 </section>
-                {/* personal info section */}
+
                 <section className="flex overflow-y-auto bg-gray-800 p-4 rounded-xl">
                     <div className="w-full">
                         <div className="flex  items-center justify-between">
