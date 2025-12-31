@@ -13,7 +13,7 @@ const Profile = () => {
                         className="flex items-center gap-2 hover:cursor-pointer group"
                         onClick={() => router("/")}
                     >
-                        <FaLaptopCode className="h-8 w-8 text-green-400 group-hover:scale-110 transition-transform duration-300" />
+                        <FaLaptopCode className="h-8 w-8 text-sky-400 group-hover:scale-110 transition-transform duration-300" />
                         <h1 className="text-2xl font-bold text-white tracking-tight">
                             Commit
                         </h1>
@@ -42,7 +42,7 @@ const Profile = () => {
                     </ul>
                 </nav>
                 {/* Profile button with dropup of logout button and settings and password change */}
-                <div className="mt-4 flex  items-center w-full bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                <div className="mt-4 flex  items-center w-full  bg-slate-800/50 backdrop-blur-lg border border-slate-700/80 rounded-lg text-white px-4 py-2 rounded-lg">
                     <div className="w-10 h-10 bg-gray-700 rounded-full overflow-hidden border-4 border-blue-500">
                         <img
                             src="https://img.icons8.com/?size=100&id=2yC9SZKcXDdX&format=png&color=22c55e"
@@ -59,20 +59,20 @@ const Profile = () => {
                 <div className="mt-auto">
                     <hr className="border-t border-gray-700 my-4" />
                     <div className="text-sm text-gray-400">
-                        &copy; 2024 Commit. All rights reserved.
+                        &copy; 2025 Commit. All rights reserved.
                     </div>
                 </div>
             </aside>
 
             <main className="flex-1 flex flex-col p-4 gap-4 overflow-hidden">
-                <header className="flex items-center justify-between mb-2 bg-green-500 p-4 rounded-xl">
+                <header className="flex items-center justify-between mb-2  bg-slate-800/50 backdrop-blur-lg border border-slate-700/80 rounded-[40px] p-4 rounded-xl">
                     <input
                         type="text"
                         placeholder="Search..."
                         className="w-1/3 p-2 bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-xl"
                     />
                     <div className="flex items-center space-x-4">
-                        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl">
+                        <button className="px-8 py-3 font-bold text-white bg-gradient-to-r from-sky-400 to-sky-600 rounded-lg hover:scale-105 transition-transform duration-300 shadow-lg shadow-sky-500/20 hover:cursor-pointer">
                             Notifications
                         </button>
                     </div>
@@ -103,7 +103,7 @@ const Profile = () => {
                             <h3 className="text-lg font-semibold mb-2">
                                 Personal Information
                             </h3>
-                            <button className="mb-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-xl">
+                            <button className="mb-4 px-8 py-3 font-bold text-white bg-gradient-to-r from-sky-400 to-sky-600 rounded-lg hover:scale-105 transition-transform duration-300 shadow-lg shadow-sky-500/20 hover:cursor-pointer">
                                 Edit{" "}
                             </button>
                         </div>
