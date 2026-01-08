@@ -16,11 +16,20 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (fUser) => {
       setFirebaseUser(fUser);
       if (fUser) {
-        const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, { name: fUser.displayName, email: fUser.email });
+        const res = await axios.post(`${API_URL}/api/v1/user/googleSignup`, {
+          name: fUser.displayName,
+          email: fUser.email,
+          avatar: fUser.photoURL || "",
+        });
         const dbUser = res.data;
+        if (res.data?.token) {
+          localStorage.setItem("commit:token", res.data.token);
+        }
+
         setUser(dbUser);
       } else {
         setUser(null);
+        localStorage.removeItem("commit:token");
       }
       setLoading(false);
     });
