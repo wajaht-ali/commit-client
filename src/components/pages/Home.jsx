@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useOutletContext } from 'react-router-dom';
-import { FaCode, FaUsers, FaLaptopCode, FaRocket, FaGlobe, FaShieldAlt } from 'react-icons/fa';
+import { FaCode, FaUsers, FaLaptopCode } from 'react-icons/fa';
 import { useAuth } from "../../context/AuthContext";
 
 const HomePage = () => {
@@ -14,7 +14,11 @@ const HomePage = () => {
                 <div className="container mx-auto max-w-7xl relative z-10">
                     <div className="flex flex-col items-center text-center">
                         <div className="fade-in-up">
-                            <span className="inline-block py-1 px-3 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-sm font-semibold mb-6">
+                            <span className="inline-flex items-center gap-2 py-1 px-3 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-sm font-semibold mb-6">
+                                <span className="relative flex h-2 w-2">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
+                                </span>
                                 v2.0 is now live
                             </span>
                         </div>

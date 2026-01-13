@@ -14,6 +14,7 @@ const Navbar = ({ toggleModal }) => {
     const { user, setUser } = useAuth();
     const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
     const router = useNavigate();
+    
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 20) {
@@ -104,7 +105,7 @@ const Navbar = ({ toggleModal }) => {
                                     className="relative flex items-center justify-center w-10 h-10 rounded-full border-2 border-slate-700 hover:border-sky-500 transition-all focus:outline-none focus:ring-4 focus:ring-sky-500/20"
                                 >
                                     <img
-                                        src={user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}&background=0EA5E9&color=fff`}
+                                        src={user?.userData?.avatar || `https://ui-avatars.com/api/?name=${user.displayName}&background=0EA5E9&color=fff`}
                                         alt="Profile"
                                         className="w-full h-full rounded-full object-cover"
                                     />
@@ -120,7 +121,7 @@ const Navbar = ({ toggleModal }) => {
                                         }`}
                                 >
                                     <div className="p-4 border-b border-slate-800">
-                                        <p className="text-sm font-semibold text-white truncate">{user.displayName}</p>
+                                        <p className="text-sm font-semibold text-white truncate">Welcome <span className="text-sky-400">{(user?.userData?.name).split(" ")[0]}</span></p>
                                         <p className="text-xs text-slate-400 truncate">{user.email}</p>
                                     </div>
                                     <div className="p-2 space-y-1">
