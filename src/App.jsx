@@ -6,6 +6,9 @@ import Home from "./components/pages/Home.jsx";
 import Login from "./components/pages/Login.jsx";
 import Signup from "./components/pages/Signup.jsx";
 import Profile from "./components/Profile/Profile.jsx";
+import ProfileInfo from "./components/Profile/ProfileInfo.jsx";
+import Dashboard from "./components/Profile/Dashboard.jsx";
+import Organization from "./components/Profile/Organization.jsx";
 import ResetPassword from "./components/pages/ResetPassword.jsx";
 import AboutUs from "./components/pages/About.jsx";
 import NotFoundPage from "./components/Layout/NotFound.jsx";
@@ -26,7 +29,11 @@ function App() {
           <Route path="/about-us" element={<AboutUs />} />
           <Route path="/contact-us" element={<ContactUsPage />} />
         </Route>
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<Profile />}>
+          <Route index element={<ProfileInfo />} />
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="organization" element={<Organization />} />
+        </Route>
         <Route path="/editor/:roomId" element={<EditorPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
