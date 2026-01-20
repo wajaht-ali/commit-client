@@ -5,6 +5,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { useAuth } from "../../context/AuthContext";
 import { auth } from "../../Firebase";
+import userImg from "../../assets/user_icon.png";
 
 const Navbar = ({ toggleModal }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -14,7 +15,7 @@ const Navbar = ({ toggleModal }) => {
     const { user, setUser } = useAuth();
     const [isMobileProfileOpen, setIsMobileProfileOpen] = useState(false);
     const router = useNavigate();
-    
+
     useEffect(() => {
         const handleScroll = () => {
             if (window.scrollY > 20) {
@@ -105,7 +106,7 @@ const Navbar = ({ toggleModal }) => {
                                     className="relative flex items-center justify-center w-10 h-10 rounded-full border-2 border-slate-700 hover:border-sky-500 transition-all focus:outline-none focus:ring-4 focus:ring-sky-500/20"
                                 >
                                     <img
-                                        src={user?.userData?.avatar || `https://ui-avatars.com/api/?name=${user.displayName}&background=0EA5E9&color=fff`}
+                                        src={user?.userData?.avatar || userImg}
                                         alt="Profile"
                                         className="w-full h-full rounded-full object-cover"
                                     />
@@ -116,13 +117,12 @@ const Navbar = ({ toggleModal }) => {
                                 {/* Dropdown Menu */}
                                 <div
                                     className={`absolute right-0 mt-3 w-60 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl origin-top-right transition-all duration-200 z-50 ${showProfile
-                                            ? "opacity-100 scale-100 translate-y-0 visible"
-                                            : "opacity-0 scale-95 -translate-y-2 invisible"
+                                        ? "opacity-100 scale-100 translate-y-0 visible"
+                                        : "opacity-0 scale-95 -translate-y-2 invisible"
                                         }`}
                                 >
                                     <div className="p-4 border-b border-slate-800">
-                                        <p className="text-sm font-semibold text-white truncate">Welcome <span className="text-sky-400">{(user?.userData?.name).split(" ")[0]}</span></p>
-                                        <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                                        <p className="text-sm font-semibold text-white truncate">Welcome <span className="text-sky-400">{user?.userData?.name && (user.userData.name).split(" ").length > 1 ? (user.userData.name).split(" ")[0] : user?.userData?.name}</span></p>
                                     </div>
                                     <div className="p-2 space-y-1">
                                         <Link
