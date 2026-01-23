@@ -100,10 +100,13 @@ const Navbar = ({ toggleModal }) => {
                     {/* Desktop Auth / Profile */}
                     <div className="hidden md:flex items-center gap-x-4">
                         {user ? (
-                            <div className="relative">
+                            <div
+                                className="relative"
+                                onMouseEnter={() => setShowProfile(true)}
+                                onMouseLeave={() => setShowProfile(false)}
+                            >
                                 <button
-                                    onClick={() => setShowProfile(!showProfile)}
-                                    className="relative flex items-center justify-center w-10 h-10 rounded-full border-2 border-slate-700 hover:border-sky-500 transition-all focus:outline-none focus:ring-4 focus:ring-sky-500/20"
+                                    className="relative flex items-center justify-center w-10 h-10 rounded-full border-2 border-slate-700 hover:border-sky-500 cursor-pointer transition-all focus:outline-none focus:ring-4 focus:ring-sky-500/20 "
                                 >
                                     <img
                                         src={user?.userData?.avatar || userImg}
@@ -116,7 +119,7 @@ const Navbar = ({ toggleModal }) => {
 
                                 {/* Dropdown Menu */}
                                 <div
-                                    className={`absolute right-0 mt-3 w-60 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-2xl shadow-xl origin-top-right transition-all duration-200 z-50 ${showProfile
+                                    className={`absolute right-0 mt-1 w-60 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-lg shadow-xl origin-top-right transition-all duration-200 z-50 ${showProfile
                                         ? "opacity-100 scale-100 translate-y-0 visible"
                                         : "opacity-0 scale-95 -translate-y-2 invisible"
                                         }`}
@@ -128,21 +131,21 @@ const Navbar = ({ toggleModal }) => {
                                         <Link
                                             to="/profile"
                                             onClick={() => setShowProfile(false)}
-                                            className="flex items-center w-full px-3 py-2 text-sm text-slate-300 rounded-lg hover:bg-slate-800 hover:text-sky-400 transition-colors"
+                                            className="flex items-center w-full px-3 py-2 text-sm text-slate-300 rounded-lg hover:bg-slate-800 hover:text-sky-400 transition-colors cursor-pointer"
                                         >
                                             My Profile
                                         </Link>
                                         <Link
                                             to="/settings"
                                             onClick={() => setShowProfile(false)}
-                                            className="flex items-center w-full px-3 py-2 text-sm text-slate-300 rounded-lg hover:bg-slate-800 hover:text-sky-400 transition-colors"
+                                            className="flex items-center w-full px-3 py-2 text-sm text-slate-300 rounded-lg hover:bg-slate-800 hover:text-sky-400 transition-colors cursor-pointer"
                                         >
                                             Settings
                                         </Link>
                                         <div className="h-px bg-slate-800 my-1"></div>
                                         <button
                                             onClick={handleLogout}
-                                            className="flex items-center w-full px-3 py-2 text-sm text-red-400 rounded-lg hover:bg-red-500/10 hover:text-red-300 transition-colors"
+                                            className="flex items-center w-full px-3 py-2 text-sm text-red-400 rounded-lg hover:bg-red-500/10 hover:text-red-300 transition-colors cursor-pointer"
                                         >
                                             Logout
                                         </button>
