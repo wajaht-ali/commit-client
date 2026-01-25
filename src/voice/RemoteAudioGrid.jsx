@@ -22,7 +22,7 @@ export default function RemoteAudioGrid({ remoteStreams, connectedUsers }) {
     return (
         <div className="flex flex-col gap-2">
             {remoteStreams.length === 0 ? (
-                <div className="text-xs text-gray-500">No remote audio yet…</div>
+                <></>
             ) : (
                 remoteStreams.map(({ socketId, stream }) => (
                     <RemoteAudio

@@ -8,7 +8,6 @@ import { defaultCodeTemplates } from '../../../utils/Utilities.jsx';
 import { languageOptions } from '../../../utils/Utilities.jsx';
 import { useMediaQuery } from '../../../context/QueriesContext.jsx';
 import { useVoiceCall } from '../../../voice/useVoiceCall.js';
-import { motion, AnimatePresence } from 'framer-motion';
 import AiAssistantModal from '../../ui/AiAssistantModal.jsx';
 
 import Sidebar from './Sidebar.jsx';
@@ -268,6 +267,7 @@ const EditorPage = () => {
     roomId,
     connectedUsers,
     leaveRoom,
+    onToggleCollapse: toggleSidebar,
     voiceProps: {
       callActive, joined, muted, isRoomCreator,
       startCall, joinCall, leaveCall, toggleMute,
@@ -301,7 +301,10 @@ const EditorPage = () => {
 
   if (!isMobile) {
     return (
-      <div className="h-screen bg-[#0d1117] text-[#c9d1d9] font-sans">
+      <div
+        className="h-screen text-[#c9d1d9] font-sans"
+        style={{ backgroundColor: '#0a0e14' }}
+      >
         <PanelGroup direction="horizontal">
           <Panel
             ref={sidebarPanelRef}
@@ -309,32 +312,50 @@ const EditorPage = () => {
             onCollapse={() => setSidebarCollapsed(true)}
             onExpand={() => setSidebarCollapsed(false)}
             defaultSize={20}
-            minSize={20}
-            maxSize={20}
-            collapsedSize={0}
+            minSize={5}
+            maxSize={25}
+            collapsedSize={5}
           >
             <Sidebar isCollapsed={isSidebarCollapsed} {...sidebarProps} />
           </Panel>
-          <PanelResizeHandle className="relative w-1.5 bg-[#161b22] hover:bg-blue-600 transition-colors">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-              <button
-                onClick={toggleSidebar}
-                className="z-10 w-6 h-6 bg-neutral-700 text-white rounded-full flex items-center justify-center hover:bg-blue-600 transition-colors cursor-pointer"
-                title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-              >
-                {isSidebarCollapsed ? <FaChevronRight size={10} /> : <FaChevronLeft size={10} />}
-              </button>
-            </div>
-          </PanelResizeHandle>
+          <PanelResizeHandle
+            className="w-1 transition-all cursor-col-resize"
+            style={{ backgroundColor: '#1e2530' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = '#3b82f6';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = '#1e2530';
+            }}
+          />
           <Panel defaultSize={80} minSize={30}>
-            <main className="flex-1 flex flex-col p-4 gap-4 h-full overflow-hidden">
-              <TopBar {...topBarProps} />
+            <main
+              className="flex-1 flex flex-col gap-3 h-full overflow-hidden"
+              style={{ backgroundColor: '#0a0e14' }}
+            >
               <PanelGroup direction="vertical" className="flex-1 min-h-0">
-                <Panel defaultSize={65} minSize={20}>
-                  <EditorPanel {...editorPanelProps} />
+                <Panel defaultSize={70} minSize={20}>
+                  <div
+                    className="flex flex-col h-full  overflow-hidden border border-[#1e2530]"
+                    style={{ backgroundColor: '#0f1419' }}
+                  >
+                    <TopBar {...topBarProps} />
+                    <div className="flex-1 relative">
+                      <EditorPanel {...editorPanelProps} />
+                    </div>
+                  </div>
                 </Panel>
-                <PanelResizeHandle className="h-1 bg-[#30363d] hover:bg-blue-500 transition-colors" />
-                <Panel defaultSize={35} minSize={10}>
+                <PanelResizeHandle
+                  className="h-1 transition-all cursor-row-resize"
+                  style={{ backgroundColor: 'transparent' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = '#3b82f6';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                />
+                <Panel defaultSize={30} minSize={15}>
                   <OutputPanel output={output} />
                 </Panel>
               </PanelGroup>
@@ -347,35 +368,29 @@ const EditorPage = () => {
   }
 
   return (
-    <div className="h-screen bg-[#0d1117] text-[#c9d1d9] font-sans flex flex-col">
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 z-40"
+    <div
+      className="h-screen text-[#c9d1d9] font-sans flex flex-col"
+      style={{ backgroundColor: 'var(--color-bg-primary)' }}
+    >
+      {isMobileMenuOpen && (
+        <>
+          <div
+            onClick={() => setMobileMenuOpen(false)}
+            className={`fixed inset-0 bg-black/60 z-40 ${isMobileMenuOpen ? 'mobile-backdrop-open' : 'mobile-backdrop-close'}`}
+          />
+          <div
+            className={`fixed top-0 left-0 h-full w-full max-w-xs z-50 ${isMobileMenuOpen ? 'mobile-sidebar-open' : 'mobile-sidebar-close'}`}
+          >
+            <Sidebar
+              isMobile
+              onClose={() => setMobileMenuOpen(false)}
+              {...sidebarProps}
             />
-            <motion.div
-              initial={{ x: '-100%' }}
-              animate={{ x: 0 }}
-              exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed top-0 left-0 h-full w-full max-w-xs z-50"
-            >
-              <Sidebar
-                isMobile
-                onClose={() => setMobileMenuOpen(false)}
-                {...sidebarProps}
-              />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+          </div>
+        </>
+      )}
 
-      <main className="flex-1 flex flex-col p-2 sm:p-4 gap-4 overflow-hidden">
+      <main className="flex-1 flex flex-col p-3 sm:p-4 gap-4 overflow-hidden">
         <TopBar
           isMobile
           onMenuClick={() => setMobileMenuOpen(true)}

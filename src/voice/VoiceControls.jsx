@@ -11,12 +11,30 @@ export default function VoiceControls({
     onToggleMute,
 }) {
     return (
-        <div className="flex items-center gap-2 bg-gray-800 rounded-md px-2 py-2">
+        <div className="flex items-center gap-2">
             {isRoomCreator && !callActive && (
                 <button
                     onClick={onStart}
-                    className="bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm py-1 px-3 rounded hover:cursor-pointer"
+                    className="text-white text-xs font-medium py-1.5 px-3 rounded-md transition-all"
+                    style={{ backgroundColor: '#1a8f7d' }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#157a6b';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#1a8f7d';
+                    }}
                     title="Start voice call (creator only)"
+                >
+                    Start Call
+                </button>
+            )}
+
+            {!isRoomCreator && !callActive && (
+                <button
+                    className="text-white text-xs font-medium py-1.5 px-3 rounded-md opacity-50 cursor-not-allowed"
+                    style={{ backgroundColor: '#1a8f7d' }}
+                    disabled
+                    title="Waiting for host to start call"
                 >
                     Start Call
                 </button>
@@ -25,10 +43,17 @@ export default function VoiceControls({
             {callActive && !joined && (
                 <button
                     onClick={onJoin}
-                    className="bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm py-1 px-3 rounded hover:cursor-pointer"
+                    className="text-white text-xs font-medium py-1.5 px-3 rounded-md transition-all"
+                    style={{ backgroundColor: '#3b82f6' }}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#2563eb';
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#3b82f6';
+                    }}
                     title="Join voice call"
                 >
-                    Join
+                    Join Call
                 </button>
             )}
 
@@ -36,14 +61,28 @@ export default function VoiceControls({
                 <>
                     <button
                         onClick={onToggleMute}
-                        className="bg-gray-700 hover:bg-gray-600 text-white text-xs sm:text-sm py-1 px-3 rounded hover:cursor-pointer"
+                        className="text-white text-xs font-medium py-1.5 px-3 rounded-md transition-all"
+                        style={{ backgroundColor: muted ? '#f59e0b' : '#3d4452' }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = muted ? '#d97706' : '#4d5563';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = muted ? '#f59e0b' : '#3d4452';
+                        }}
                         title={muted ? "Unmute" : "Mute"}
                     >
                         {muted ? "Unmute" : "Mute"}
                     </button>
                     <button
                         onClick={onLeave}
-                        className="bg-red-600 hover:bg-red-700 text-white text-xs sm:text-sm py-1 px-3 rounded hover:cursor-pointer"
+                        className="text-white text-xs font-medium py-1.5 px-3 rounded-md transition-all"
+                        style={{ backgroundColor: '#ef4444' }}
+                        onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = '#dc2626';
+                        }}
+                        onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = '#ef4444';
+                        }}
                         title="Leave voice call"
                     >
                         Leave
@@ -52,7 +91,15 @@ export default function VoiceControls({
             )}
 
             {!callActive && (
-                <span className="text-gray-400 text-xs ml-1">No active call</span>
+                <span
+                    className="text-xs px-2 py-1 rounded"
+                    style={{
+                        color: '#6e7681',
+                        backgroundColor: '#1a2028'
+                    }}
+                >
+                    No active call
+                </span>
             )}
         </div>
     );
