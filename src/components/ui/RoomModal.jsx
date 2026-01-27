@@ -56,8 +56,8 @@ const RoomModal = ({ isVisible, toggleModal }) => {
 
     const handleJoinRoom = (e) => {
         e.preventDefault();
-        if (roomId.trim() === "") {
-            toast.error("Please enter a Room ID.");
+        if (roomId.trim() === "" || roomId.length < 6 || roomId.length > 6) {
+            toast.error("Please enter a valid Room ID.");
             return;
         }
         navigate(`/editor/${roomId}`);
@@ -116,6 +116,8 @@ const RoomModal = ({ isVisible, toggleModal }) => {
                                     type="text"
                                     placeholder="Enter Room ID"
                                     value={roomId}
+                                    minLength={6}
+                                    maxLength={6}
                                     required
                                     onChange={(e) => setRoomId(e.target.value.toUpperCase())}
                                     className="px-4 py-3 text-slate-200 rounded-lg border border-slate-700 bg-slate-900 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition placeholder-slate-500"

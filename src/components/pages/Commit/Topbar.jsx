@@ -1,6 +1,9 @@
-import { FaBars, FaPlay } from "react-icons/fa";
+import { useState, useRef, useEffect } from "react";
+import { FaBars, FaPlay, FaChevronDown, FaCheck } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi2";
 import { languageOptions } from "../../../utils/Utilities";
+import { TbBrandJavascript, TbBrandCpp } from "react-icons/tb";
+import { IoLogoPython } from "react-icons/io";
 
 const TopBar = ({
     isMobile,
@@ -10,125 +13,105 @@ const TopBar = ({
     runCode,
     setIsAiModalOpen
 }) => {
-    // Get language icon/emoji
-    const getLanguageIcon = () => {
-        switch (language) {
-            case 'python': return '🐍';
-            case 'javascript': return '📜';
-            case 'cpp': return '⚙️';
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const getLanguageIcon = (lang) => {
+        switch (lang) {
+            case 'python': return <IoLogoPython />;
+            case 'javascript': return <TbBrandJavascript />;
+            case 'cpp': return <TbBrandCpp />;
             default: return '📝';
         }
     };
 
+    const currentLanguageLabel = languageOptions.find(opt => opt.value === language)?.label || language;
+
+    const onLanguageSelect = (value) => {
+        handleLanguageChange({ target: { value } });
+        setIsDropdownOpen(false);
+    };
+
     return (
         <div
-            className="flex items-center border-b border-gray-700 justify-between px-4 py-2.5"
-            style={{ backgroundColor: '#000' }}
+            className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-2.5 border-b border-[#1e2530] bg-[#000]"
         >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
                 {isMobile && (
                     <button
                         onClick={onMenuClick}
-                        className="p-2 rounded-lg transition-all"
-                        style={{ color: '#8b949e' }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = '#1a2028';
-                            e.currentTarget.style.color = '#e6edf3';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = 'transparent';
-                            e.currentTarget.style.color = '#8b949e';
-                        }}
+                        className="p-1.5 sm:p-2 rounded-lg text-[#8b949e] hover:bg-[#1a2028] hover:text-[#e6edf3] transition-colors"
                     >
-                        <FaBars size={18} />
+                        <FaBars size={isMobile ? 16 : 18} />
                     </button>
                 )}
 
-                {/* Language Selector */}
-                <div className="relative">
-                    <div
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-[2px] cursor-pointer"
-                        style={{ backgroundColor: '#0a0c0fff' }}
+                <div className="relative" ref={dropdownRef}>
+                    <button
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="flex items-center gap-2 px-2 py-1.5 sm:px-3 sm:py-1.5 rounded-[3px] bg-[#30363d] hover:bg-[#161b22] border border-transparent hover:border-[#30363d] transition-all duration-200 cursor-pointer group"
                     >
-                        <span className="text-base">{getLanguageIcon()}</span>
-                        <select
-                            value={language}
-                            onChange={handleLanguageChange}
-                            className="bg-transparent text-sm font-medium appearance-none cursor-pointer pr-4 outline-none border-none"
-                            style={{ color: '#e6edf3' }}
-                        >
-                            {languageOptions.map(option => (
-                                <option
-                                    key={option.value}
-                                    value={option.value}
-                                    style={{ backgroundColor: '#1a2028', color: '#e6edf3', }}
-                                >
-                                    {option.label}
-                                </option>
-                            ))}
-                        </select>
-                        <span
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs pointer-events-none"
-                            style={{ color: '#6e7681' }}
-                        >
-                            ▼
+                        <span className="text-base sm:text-lg">{getLanguageIcon(language)}</span>
+                        <span className="text-xs sm:text-sm font-medium text-[#e6edf3]">
+                            {currentLanguageLabel}
                         </span>
-                    </div>
+                        <FaChevronDown
+                            className={`text-[10px] text-[#6e7681] transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`}
+                        />
+                    </button>
+
+                    {isDropdownOpen && (
+                        <div className="absolute top-full left-0 mt-1 w-48 bg-[#1a2028] border border-[#30363d] rounded-md shadow-xl z-50 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-100">
+                            {languageOptions.map((option) => (
+                                <button
+                                    key={option.value}
+                                    onClick={() => onLanguageSelect(option.value)}
+                                    className={`w-full text-left px-3 py-2 flex items-center justify-between gap-2 hover:bg-[#21262d] transition-colors ${language === option.value ? 'bg-[#111] text-white' : 'text-[#c9d1d9]'
+                                        }`}
+                                >
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-base">{getLanguageIcon(option.value)}</span>
+                                        <span className="text-xs sm:text-sm">{option.label}</span>
+                                    </div>
+                                    {language === option.value && (
+                                        <FaCheck className="text-xs text-green-500" />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 
             <div className="flex items-center gap-2">
-                {/* Ask AI Button */}
-                <button
-                    onClick={() => setIsAiModalOpen(true)}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-[3px] font-medium text-sm transition-all cursor-pointer"
-                    style={{
-                        backgroundColor: '#10b981',
-                        color: 'white'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#059669';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#10b981';
-                    }}
-                    title="Ask AI (⌘K)"
-                >
-                    <HiSparkles size={16} />
-                    <span>Ask AI</span>
-                    <span
-                        className="text-xs px-1.5 py-0.5 rounded ml-1"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
-                    >
-                        ⌘K
-                    </span>
-                </button>
-
-                {/* Run Button */}
                 <button
                     onClick={runCode}
-                    className="flex items-center gap-2 px-3 py-1.5 rounded-[3px] font-medium text-sm transition-all cursor-pointer"
-                    style={{
-                        backgroundColor: '#10b981',
-                        color: 'white'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = '#059669';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = '#10b981';
-                    }}
+                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-[3px] bg-emerald-500 hover:bg-emerald-600 text-white transition-all shadow-sm hover:shadow-md cursor-pointer group"
                     title="Run Code (⌘R)"
                 >
-                    <FaPlay size={12} />
-                    <span>Run</span>
-                    <span
-                        className="text-xs px-1.5 py-0.5 rounded ml-1"
-                        style={{ backgroundColor: 'rgba(0,0,0,0.2)' }}
-                    >
-                        ⌘R
-                    </span>
+                    <FaPlay className="w-3 h-3 sm:w-3 sm:h-3 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs sm:text-sm font-medium">Run</span>
                 </button>
+                
+                <button
+                    onClick={() => setIsAiModalOpen(true)}
+                    className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-[3px] bg-emerald-500 hover:bg-emerald-600 text-white transition-all shadow-sm hover:shadow-md cursor-pointer group"
+                    title="Ask AI (⌘K)"
+                >
+                    <HiSparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs sm:text-sm font-medium">Ask AI</span>
+                </button>
+
             </div>
         </div>
     );

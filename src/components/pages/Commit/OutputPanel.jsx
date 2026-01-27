@@ -17,19 +17,15 @@ const OutputPanel = ({ output }) => {
             case 'output':
                 return (
                     <div className="flex-1 flex flex-col">
-                        {/* Console Header */}
-
-
-                        {/* Terminal Output */}
                         <pre
-                            className="flex-1 text-sm whitespace-pre-wrap overflow-y-auto font-mono editor-scrollbar"
+                            className="flex-1 text-sm whitespace-pre-wrap overflow-y-auto font-mono p-2 editor-scrollbar"
                             style={{ backgroundColor: '#000000' }}
                         >
                             {output ? (
-                                <span style={{ color: '#10b981', padding: '16px' }}>{output}</span>
+                                <span style={{ color: '#10b981' }}>{output}</span>
                             ) : (
                                 <>
-                                    <span style={{ color: '#6e7681', padding: '16px' }}>No output available.</span>
+                                    <span style={{ color: '#6e7681' }}>No output available.</span>
                                 </>
                             )}
                         </pre>
@@ -66,10 +62,10 @@ const OutputPanel = ({ output }) => {
         return (
             <button
                 onClick={() => setActiveTab(name)}
-                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all relative"
+                className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all relative cursor-pointer"
                 style={{
                     color: isActive ? '#e6edf3' : '#6e7681',
-                    backgroundColor: 'transparent'
+                    backgroundColor: isActive ? '#000000' : 'transparent'
                 }}
                 onMouseEnter={(e) => {
                     if (!isActive) {
@@ -82,24 +78,23 @@ const OutputPanel = ({ output }) => {
                     }
                 }}
             >
-                <Icon size={14} />
-                {label}
                 {isActive && (
                     <span
-                        className="absolute bottom-0 left-0 right-0 h-0.5"
+                        className="absolute top-0 left-0 right-0 h-0.5"
                         style={{ backgroundColor: '#3b82f6' }}
                     />
                 )}
+                <Icon size={14} />
+                {label}
             </button>
         );
     };
 
     return (
         <div
-            className="rounded-lg flex flex-col h-full overflow-hidden"
+            className="flex flex-col h-full overflow-hidden"
             style={{ backgroundColor: '#0f1419' }}
         >
-            {/* Tab Bar */}
             <div
                 className="flex items-center"
                 style={{ borderBottom: '1px solid #1e2530' }}
