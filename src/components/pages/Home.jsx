@@ -9,7 +9,6 @@ const HomePage = () => {
 
     return (
         <div className="font-sans text-slate-50">
-            {/* Hero Section */}
             <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 overflow-hidden">
                 <div className="container mx-auto max-w-7xl relative z-10">
                     <div className="flex flex-col items-center text-center">
@@ -39,14 +38,14 @@ const HomePage = () => {
                             {user?.userData ? (
                                 <button
                                     onClick={toggleModal}
-                                    className="px-8 py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-full font-semibold text-lg transition-all shadow-[0_0_40px_-10px_rgba(14,165,233,0.5)] hover:shadow-[0_0_60px_-10px_rgba(14,165,233,0.6)] hover:-translate-y-1"
+                                    className="px-8 py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-full font-semibold text-lg transition-all shadow-[0_0_40px_-10px_rgba(14,165,233,0.5)] hover:shadow-[0_0_60px_-10px_rgba(14,165,233,0.6)] hover:-translate-y-1 hover:cursor-pointer"
                                 >
                                     Create or Join Room
                                 </button>
                             ) : (
                                 <button
                                     onClick={() => window.location.href = '/auth/login'}
-                                    className="px-8 py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-full font-semibold text-lg transition-all shadow-[0_0_40px_-10px_rgba(14,165,233,0.5)] hover:shadow-[0_0_60px_-10px_rgba(14,165,233,0.6)] hover:-translate-y-1"
+                                    className="px-8 py-4 bg-sky-500 hover:bg-sky-400 text-white rounded-full font-semibold text-lg transition-all shadow-[0_0_40px_-10px_rgba(14,165,233,0.5)] hover:shadow-[0_0_60px_-10px_rgba(14,165,233,0.6)] hover:-translate-y-1 hover:cursor-pointer"
                                 >
                                     Get Started
                                 </button>
@@ -59,7 +58,6 @@ const HomePage = () => {
                 </div>
             </section>
 
-            {/* Features Grid */}
             <section id="features" className="py-24 relative">
                 <div className="container mx-auto px-6 max-w-7xl">
                     <div className="text-center mb-16">
@@ -68,7 +66,6 @@ const HomePage = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Feature 1 */}
                         <div className="group p-8 rounded-3xl bg-slate-900/50 border border-white/5 hover:bg-slate-800/50 hover:border-sky-500/20 transition-all duration-300">
                             <div className="h-12 w-12 rounded-2xl bg-sky-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <FaCode className="text-2xl text-sky-400" />
@@ -89,7 +86,6 @@ const HomePage = () => {
                             </p>
                         </div>
 
-                        {/* Feature 3 */}
                         <div className="group p-8 rounded-3xl bg-slate-900/50 border border-white/5 hover:bg-slate-800/50 hover:border-teal-500/20 transition-all duration-300">
                             <div className="h-12 w-12 rounded-2xl bg-teal-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                                 <FaLaptopCode className="text-2xl text-teal-400" />
@@ -151,12 +147,19 @@ const HomePage = () => {
                             <p className="text-sky-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
                                 Join thousands of developers who are already using Commit to better their coding workflow.
                             </p>
-                            <button
-                                onClick={toggleModal}
-                                className="px-8 py-4 bg-white text-sky-600 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl"
+                            {user?.userData ? (
+                                <button
+                                    onClick={toggleModal}
+                                    className="px-8 py-4 bg-white text-sky-600 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl hover:cursor-pointer"
+                                >
+                                    Start Coding Now
+                                </button>
+                            ) : (<button
+                                onClick={() => window.location.href = '/auth/login'}
+                                className="px-8 py-4 bg-white text-sky-600 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl hover:cursor-pointer"
                             >
                                 Start Coding Now
-                            </button>
+                            </button>)}
                         </div>
                     </div>
                 </div>

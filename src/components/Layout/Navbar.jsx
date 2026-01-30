@@ -52,7 +52,6 @@ const Navbar = ({ toggleModal }) => {
         >
             <div className="container mx-auto px-6 max-w-7xl">
                 <div className="flex justify-between items-center">
-                    {/* Logo */}
                     <Link
                         to="/"
                         className="flex items-center gap-2 group"
@@ -66,7 +65,6 @@ const Navbar = ({ toggleModal }) => {
                         </span>
                     </Link>
 
-                    {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-x-1">
                         <NavLink
                             to="/features"
@@ -97,7 +95,6 @@ const Navbar = ({ toggleModal }) => {
                         </NavLink>
                     </div>
 
-                    {/* Desktop Auth / Profile */}
                     <div className="hidden md:flex items-center gap-x-4">
                         {user ? (
                             <div
@@ -113,11 +110,9 @@ const Navbar = ({ toggleModal }) => {
                                         alt="Profile"
                                         className="w-full h-full rounded-full object-cover"
                                     />
-                                    {/* Online Indicator */}
                                     <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-slate-900 rounded-full"></span>
                                 </button>
 
-                                {/* Dropdown Menu */}
                                 <div
                                     className={`absolute right-0 mt-1 w-60 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-lg shadow-xl origin-top-right transition-all duration-200 z-50 ${showProfile
                                         ? "opacity-100 scale-100 translate-y-0 visible"
@@ -154,12 +149,6 @@ const Navbar = ({ toggleModal }) => {
                             </div>
                         ) : (
                             <>
-                                <button
-                                    onClick={() => navigate("/")}
-                                    className="px-5 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors"
-                                >
-                                    Enterprise
-                                </button>
                                 <button
                                     onClick={() => navigate("/auth/login")}
                                     className="px-5 py-2 text-sm font-semibold text-white bg-sky-500 hover:bg-sky-400 rounded-full transition-all shadow-[0_0_20px_-5px_rgba(14,165,233,0.5)] hover:shadow-[0_0_25px_-5px_rgba(14,165,233,0.6)]"
@@ -212,12 +201,6 @@ const Navbar = ({ toggleModal }) => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 gap-3 pt-2">
-                            <button
-                                onClick={() => { navigate("/"); closeAllMenus(); }}
-                                className="py-2.5 text-sm font-semibold text-slate-300 border border-slate-700 rounded-lg hover:bg-slate-800 transition-colors"
-                            >
-                                Enterprise
-                            </button>
                             <button
                                 onClick={() => { navigate("/auth/login"); closeAllMenus(); }}
                                 className="py-2.5 text-sm font-semibold text-white bg-sky-500 rounded-lg hover:bg-sky-400 transition-colors"

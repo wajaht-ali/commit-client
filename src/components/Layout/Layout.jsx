@@ -3,11 +3,13 @@ import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import RoomModal from '../ui/RoomModal';
+import { useScrollToTop } from '../../hooks/useScrollToTop';
 
 const Layout = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [user, setUser] = useState(null);
 
+    useScrollToTop();
     const toggleModal = () => {
         setIsModalOpen(!isModalOpen);
     };
@@ -19,7 +21,7 @@ const Layout = () => {
 
     return (
         <div className="bg-slate-950 min-h-screen flex flex-col relative overflow-x-hidden">
-            
+
             <div className="fixed inset-0 z-0 pointer-events-none">
                 <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-sky-500/10 rounded-full blur-[120px]" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-500/10 rounded-full blur-[120px]" />
