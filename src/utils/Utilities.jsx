@@ -84,3 +84,29 @@ export const getOrCreateUsername = () => {
     }
     return name;
 };
+
+export const getAuthErrorMessage = (errorCode) => {
+  const errorMessages = {
+    "auth/email-already-in-use": "This email is already registered. Please log in instead.",
+    "auth/weak-password": "Password is too weak. Use at least 8 characters.",
+    "auth/invalid-email": "Please enter a valid email address.",
+    "auth/popup-closed-by-user": "Sign-up was cancelled. Please try again.",
+    "auth/cancelled-popup-request": "Sign-up was cancelled.",
+    "auth/network-request-failed": "Network error. Please check your connection.",
+  };
+  return errorMessages[errorCode] || "An error occurred. Please try again.";
+};
+
+export const getAuthLoginErrorMessage = (errorCode) => {
+  const errorMessages = {
+    "auth/invalid-credential": "Invalid email or password. Please try again.",
+    "auth/user-not-found": "No account found with this email. Please sign up.",
+    "auth/wrong-password": "Incorrect password. Please try again.",
+    "auth/too-many-requests": "Too many failed attempts. Please try again later.",
+    "auth/user-disabled": "This account has been disabled. Contact support.",
+    "auth/popup-closed-by-user": "Sign-in was cancelled. Please try again.",
+    "auth/cancelled-popup-request": "Sign-in was cancelled.",
+    "auth/network-request-failed": "Network error. Please check your connection.",
+  };
+  return errorMessages[errorCode] || "An error occurred. Please try again.";
+};

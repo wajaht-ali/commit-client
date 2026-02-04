@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { fetchUserProfile, updateUserProfile } from "../../utils/api";
 import toast from "react-hot-toast";
 import { FaUser } from "react-icons/fa";
+import userImg from "../../assets/user_icon.png";
 
 const ProfileInfo = () => {
     const { user: authUser } = useAuth();
@@ -41,7 +42,7 @@ const ProfileInfo = () => {
                     }
                     : socialLinks || { github: "", linkedin: "" };
 
-                const avatar = userData.avatar || "";
+                const avatar = userData.avatar || userImg;
 
                 setFormData({
                     name: userData.name || "",
@@ -117,7 +118,7 @@ const ProfileInfo = () => {
             const updateData = {
                 name: formData.name.trim(),
                 headline: formData.headline.trim(),
-                // avatar: formData.avatar || "",
+                avatar: formData.avatar || "",
                 socialLinks: formData.socialLinks,
             };
 
@@ -167,7 +168,6 @@ const ProfileInfo = () => {
             </div>
         );
     }
-
     const displayName = user.name || "User";
     const displayHeadline = user.headline || "-";
     const displayAvatar =
