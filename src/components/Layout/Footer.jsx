@@ -21,7 +21,7 @@ const Footer = () => {
                             </span>
                         </Link>
                         <p className="text-sm max-w-sm text-slate-400 leading-relaxed">
-                            Your collaborative coding environment for seamless peer programming. Code in sync, learn in sync, and build together.
+                            The browser-based pair programming tool with integrated audio.
                         </p>
                     </div>
 

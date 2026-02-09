@@ -8,7 +8,7 @@ import { FcGoogle } from "react-icons/fc";
 import { FaEye, FaEyeSlash, FaExclamationCircle } from "react-icons/fa";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { getAuthLoginErrorMessage } from "../../utils/Utilities";
+import { getAuthErrorMessage, getAuthLoginErrorMessage } from "../../utils/Utilities";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -87,14 +87,13 @@ export default function Login() {
 
         <div className="relative z-10 max-w-lg text-center fade-in-up">
           <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-slate-50 leading-tight">
-            Build Your Commitment <br />
+            Simple, Fast Access for <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">
-              Through Code
+              Your Team.
             </span>
           </h2>
           <p className="text-lg text-slate-400 leading-relaxed">
-            Create your account and join us in our commitment to code. Experience real-time
-            collaboration like never before.
+            Sign in to jump straight into shared coding rooms. Your workspace stays organized by project — no extra tools or logins needed.
           </p>
         </div>
       </div>

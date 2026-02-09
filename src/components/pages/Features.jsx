@@ -18,7 +18,7 @@ const featuresList = [
     {
         id: '03',
         name: 'Multi-Language Support',
-        description: 'From Python to JavaScript, our editor supports a wide range of popular programming languages with syntax highlighting.',
+        description: 'From Python to JavaScript, our editor supports multiple programming languages with syntax highlighting.',
         icon: <FaLanguage />
     },
     {

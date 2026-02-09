@@ -1,15 +1,18 @@
 /* eslint-disable no-unused-vars */
+import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { FaCode, FaUsers, FaLaptopCode } from 'react-icons/fa';
 import { useAuth } from "../../context/AuthContext";
+import DemoModal from '../ui/DemoModal';
 
 const HomePage = () => {
     const { user } = useAuth();
     const { toggleModal } = useOutletContext();
+    const [isDemoOpen, setIsDemoOpen] = useState(false);
 
     return (
         <div className="font-sans text-slate-50">
-            <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 overflow-hidden">
+            <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 px-6 overflow-hidden">
                 <div className="container mx-auto max-w-7xl relative z-10">
                     <div className="flex flex-col items-center text-center">
                         <div className="fade-in-up">
@@ -18,20 +21,19 @@ const HomePage = () => {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-sky-500"></span>
                                 </span>
-                                v2.0 is now live
+                                v1.0 is now live
                             </span>
                         </div>
 
                         <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-8 fade-in-up delay-100">
-                            Code your commitments, <br />
+                            Build and Debug Code, <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-400 to-teal-400">
                                 Live & Sync.
                             </span>
                         </h1>
 
                         <p className="max-w-2xl text-lg md:text-xl text-slate-400 mb-10 fade-in-up delay-200">
-                            A shared coding space built for dedicated partnership and deep focus.
-                            Experience the seamless, real-time environment designed for modern developers.
+                            Work with teammates on the same code in real-time. See edits instantly, talk naturally through built-in <span className='underline text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-400 to-teal-400'>audio calls</span>, and solve problems together, just like sitting side-by-side.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 fade-in-up delay-300">
@@ -50,7 +52,10 @@ const HomePage = () => {
                                     Get Started
                                 </button>
                             )}
-                            <button className="px-8 py-4 bg-slate-800/50 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-600 rounded-full font-semibold text-lg transition-all backdrop-blur-sm">
+                            <button
+                                onClick={() => setIsDemoOpen(true)}
+                                className="px-8 py-4 bg-slate-800/50 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-600 rounded-full font-semibold text-lg transition-all backdrop-blur-sm"
+                            >
                                 View Demo
                             </button>
                         </div>
@@ -62,7 +67,7 @@ const HomePage = () => {
                 <div className="container mx-auto px-6 max-w-7xl">
                     <div className="text-center mb-16">
                         <h2 className="text-3xl md:text-5xl font-bold mb-4">Why Choose Commit?</h2>
-                        <p className="text-slate-400 text-lg">Built for speed, reliability, and seamless collaboration.</p>
+                        <p className="text-slate-400 text-lg">No confusing setups. No scattered tools. Just real collaboration.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -145,7 +150,7 @@ const HomePage = () => {
                         <div className="relative z-10 text-white">
                             <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to code together?</h2>
                             <p className="text-sky-100 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-                                Join thousands of developers who are already using Commit to better their coding workflow.
+                                Collaboration That Feels Like You’re in the Same Room.
                             </p>
                             {user?.userData ? (
                                 <button
@@ -164,6 +169,8 @@ const HomePage = () => {
                     </div>
                 </div>
             </section>
+
+            <DemoModal isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
         </div>
     );
 };
