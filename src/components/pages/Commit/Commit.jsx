@@ -1,15 +1,14 @@
-/* eslint-disable no-unused-vars */
-
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { FaChevronLeft, FaChevronRight, FaBars, FaCopy } from 'react-icons/fa';
 import { useSocket } from '../../../context/SocketContext.jsx';
 import { defaultCodeTemplates } from '../../../utils/Utilities.jsx';
-import { languageOptions } from '../../../utils/Utilities.jsx';
 import { useMediaQuery } from '../../../context/QueriesContext.jsx';
 import { useVoiceCall } from '../../../voice/useVoiceCall.js';
+import { useRoomSocket } from '../../../hooks/useRoomSocket.js';
+import { executeCode } from '../../../utils/codeExecutor.js';
+import { generateCode, insertGeneratedCode } from '../../../utils/aiService.js';
+import { handleLanguageSwitch } from '../../../utils/languageHandler.js';
 import AiAssistantModal from '../../ui/AiAssistantModal.jsx';
-
 import Sidebar from './Sidebar.jsx';
 import TopBar from './Topbar.jsx';
 import OutputPanel from './OutputPanel.jsx';
@@ -19,46 +18,30 @@ import {
   PanelGroup,
   PanelResizeHandle,
 } from "react-resizable-panels";
-import toast from 'react-hot-toast';
-import axios from 'axios';
 
 const EditorPage = () => {
   const { roomId } = useParams();
   const socket = useSocket();
   const navigate = useNavigate();
   const location = useLocation();
-  const codeRef = useRef(null);
-  const hasJoined = useRef(false);
 
   const [language, setLanguage] = useState(() => {
     return localStorage.getItem('selectedLanguage') || 'javascript';
   });
 
   const [connectedUsers, setConnectedUsers] = useState([]);
-  const [code, setCode] = useState(``);
+  const [languageCodeMap, setLanguageCodeMap] = useState({});
   const [output, setOutput] = useState('');
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
   const [generatedCode, setGeneratedCode] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const sidebarPanelRef = useRef(null);
-  const isMobile = useMediaQuery('(max-width: 1023px)');
-
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const toggleSidebar = () => {
-    const panel = sidebarPanelRef.current;
-    if (panel) {
-      if (isSidebarCollapsed) {
-        panel.expand();
-      } else {
-        panel.collapse();
-      }
-    }
-  };
 
+  const sidebarPanelRef = useRef(null);
+  const isMobile = useMediaQuery('(max-width: 1023px');
   const isRoomCreator = connectedUsers[0]?.socketId === socket?.id;
-  const BASE_URI = import.meta.env.VITE_API_URL;
 
   const {
     callActive,
@@ -72,187 +55,90 @@ const EditorPage = () => {
     errors: voiceError,
   } = useVoiceCall({ socket, roomId, isRoomCreator });
 
-  useEffect(() => {
-    setCode(defaultCodeTemplates[language]);
-  }, []);
+  const getCurrentCode = () => {
+    return languageCodeMap[language] || defaultCodeTemplates[language] || '';
+  };
 
-  useEffect(() => {
-    if (!socket) return;
-
-    if (!hasJoined.current) {
-      socket.emit('join-room', {
-        roomId,
-        username: `User_${Math.floor(Math.random() * 1000)}`,
-        isCreating: location.state?.isCreating,
-      });
-      hasJoined.current = true;
+  const toggleSidebar = () => {
+    const panel = sidebarPanelRef.current;
+    if (panel) {
+      if (isSidebarCollapsed) {
+        panel.expand();
+      } else {
+        panel.collapse();
+      }
     }
-
-    socket.on('update-user-list', (users) => {
-      setConnectedUsers(users);
-    });
-
-    const handleCodeUpdate = (newCode) => {
-      setCode(newCode);
-    };
-    socket.on('code-update', handleCodeUpdate);
-    socket.on('language-update', (newLanguage) => {
-      setLanguage(newLanguage);
-      toast.success(`Language switched to ${languageOptions.find(l => l.value === newLanguage)?.label || 'a new language'}`);
-    });
-
-    socket.on('get-code-state', () => {
-      if (codeRef.current) {
-        socket.emit('send-code-state', { roomId, code: codeRef.current });
-      }
-    });
-
-    const handleUserLeft = ({ username }) => {
-      if (username) {
-        toast.error(`${username} has left the room.`);
-      }
-    };
-    socket.on('user-left', handleUserLeft);
-
-    const handleUserJoined = ({ username }) => {
-      if (username) {
-        toast.success(`${username} has joined the room.`);
-      }
-    };
-    socket.on('user-joined', handleUserJoined);
-
-    const handleRoomNotFound = ({ message }) => {
-      toast.error(message);
-      navigate('/');
-    };
-    socket.on('room-not-found', handleRoomNotFound);
-
-    const handleRoomFull = ({ message }) => {
-      toast.error(message || "Room is full. Please try creating a new one.");
-      setTimeout(() => {
-        window.location.replace('/');
-      }, 2000);
-    };
-
-    socket.on('room-full', handleRoomFull);
-
-    return () => {
-      socket.off('update-user-list');
-      socket.off('code-update', handleCodeUpdate);
-      socket.off('get-code-state');
-      socket.off('user-left', handleUserLeft);
-      socket.off('user-joined', handleUserJoined);
-      socket.off('language-update');
-      socket.off('room-not-found', handleRoomNotFound);
-      socket.off('room-full', handleRoomFull);
-    };
-
-  }, [socket, roomId, location.state, navigate]);
+  };
 
   useEffect(() => {
-    codeRef.current = code;
-  }, [code]);
+    if (!languageCodeMap[language]) {
+      setLanguageCodeMap(prev => ({
+        ...prev,
+        [language]: defaultCodeTemplates[language] || ''
+      }));
+    }
+  }, [language, languageCodeMap]);
+
+  useRoomSocket({
+    socket,
+    roomId,
+    language,
+    location,
+    navigate,
+    setConnectedUsers,
+    setLanguageCodeMap,
+    setLanguage,
+    getCurrentCode,
+  });
 
   const handleEditorChange = (value) => {
-    setCode(value);
+    setLanguageCodeMap(prev => ({
+      ...prev,
+      [language]: value
+    }));
     if (socket) {
       socket.emit('code-change', { roomId, code: value });
     }
   };
 
+  const handleLanguageChange = (e) => {
+    handleLanguageSwitch(
+      e.target.value,
+      languageCodeMap,
+      socket,
+      roomId,
+      setLanguage,
+      setLanguageCodeMap
+    );
+  };
+
+  const runCode = () => executeCode(language, getCurrentCode(), setOutput);
+
+  const handleAiGenerate = () => {
+    generateCode(aiPrompt, language, setGeneratedCode, setIsGenerating);
+  };
+
+  const handleAiInsert = () => {
+    insertGeneratedCode(
+      getCurrentCode(),
+      generatedCode,
+      language,
+      socket,
+      roomId,
+      setLanguageCodeMap,
+      setIsAiModalOpen,
+      setAiPrompt,
+      setGeneratedCode
+    );
+  };
+  
+
   const leaveRoom = () => {
     localStorage.removeItem('selectedLanguage');
-
     if (socket) {
       socket.disconnect();
     }
     window.location.replace('/');
-  };
-
-  const handleLanguageChange = (e) => {
-    const newLanguage = e.target.value;
-    setLanguage(newLanguage);
-    localStorage.setItem('selectedLanguage', newLanguage);
-
-    const template = defaultCodeTemplates[newLanguage] || "// Start coding here...";
-    setCode(template);
-    codeRef.current = template;
-
-    socket.emit('language-change', { roomId, language: newLanguage });
-    socket.emit('code-change', { roomId, code: template });
-    toast.success(`Language switched to ${languageOptions.find(l => l.value === newLanguage)?.label || 'a new language'}`);
-  };
-
-  const runCode = async () => {
-    setOutput('Executing...');
-
-    if (language === 'javascript') {
-      try {
-        let consoleOutput = '';
-        const originalConsoleLog = console.log;
-        console.log = (...args) => {
-          consoleOutput += args.map(String).join(' ') + '\n';
-        };
-        new Function(code)();
-        console.log = originalConsoleLog;
-        setOutput(consoleOutput || 'Execution finished with no output.');
-      } catch (err) {
-        setOutput(err instanceof Error ? `Error: ${err.message}` : 'An unknown error occurred.');
-      }
-      return;
-    }
-
-    if (language === 'python' || language === 'cpp') {
-      try {
-        const response = await axios.post(`${BASE_URI}/api/v1/code/execute`, {
-          language,
-          code,
-        });
-        console.log("response: ", response);
-        setOutput(response.data.output || 'Execution finished with no output.');
-
-      } catch (error) {
-        console.log("Errorrr: ", error);
-        if (error.response && error.response.data && error.response.data.output) {
-          setOutput(`Error: ${error.response.data.output}`);
-        } else {
-          setOutput('Failed to connect to the execution service. Please check the server.');
-        }
-      }
-      return;
-    }
-
-    setOutput(`Execution for language "${language}" is not supported.`);
-  };
-
-  const handleGenerateCode = async () => {
-    setIsGenerating(true);
-    setGeneratedCode('');
-    try {
-      const response = await axios.post(`${BASE_URI}/api/v1/ai/code-generation`, {
-        prompt: aiPrompt,
-        language,
-      });
-      setGeneratedCode(response.data.generatedCode);
-    } catch (error) {
-      toast.error('Failed to generate code. Please try again.');
-      console.error(error);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const insertGeneratedCode = () => {
-    const newCode = code + '\n\n' + generatedCode;
-    setCode(newCode);
-
-    if (socket) {
-      socket.emit('code-change', { roomId, code: newCode });
-    }
-
-    setIsAiModalOpen(false);
-    setAiPrompt('');
-    setGeneratedCode('');
   };
 
   if (!socket) {
@@ -282,20 +168,14 @@ const EditorPage = () => {
     setIsAiModalOpen,
   };
 
-  const editorPanelProps = {
-    language,
-    code,
-    handleEditorChange,
-  };
-
   const aiModalProps = {
     isOpen: isAiModalOpen,
     prompt: aiPrompt,
     setPrompt: setAiPrompt,
     isGenerating: isGenerating,
     generatedCode: generatedCode,
-    onGenerate: handleGenerateCode,
-    onInsert: insertGeneratedCode,
+    onGenerate: handleAiGenerate,
+    onInsert: handleAiInsert,
     onClose: () => setIsAiModalOpen(false),
   };
 
@@ -341,7 +221,7 @@ const EditorPage = () => {
                   >
                     <TopBar {...topBarProps} />
                     <div className="flex-1 relative">
-                      <EditorPanel {...editorPanelProps} />
+                      <EditorPanel language={language} code={getCurrentCode()} handleEditorChange={handleEditorChange} />
                     </div>
                   </div>
                 </Panel>
@@ -398,7 +278,7 @@ const EditorPage = () => {
         />
         <div className="flex-1 flex flex-col gap-4 min-h-0">
           <div className="flex-1 min-h-0">
-            <EditorPanel {...editorPanelProps} />
+            <EditorPanel language={language} code={getCurrentCode()} handleEditorChange={handleEditorChange} />
           </div>
           <div className="flex-1 min-h-0">
             <OutputPanel output={output} />
