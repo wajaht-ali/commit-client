@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# Avoid indexing non-canonical / private app areas
+Disallow: /auth/
+Disallow: /profile/
+Disallow: /editor/
+
+Sitemap: https://codecommit.site/sitemap.xml
+

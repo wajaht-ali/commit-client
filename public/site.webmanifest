@@ -1,0 +1,17 @@
+{
+    "name": "CodeCommit",
+    "short_name": "CodeCommit",
+    "start_url": "/",
+    "scope": "/",
+    "display": "standalone",
+    "background_color": "#0b1220",
+    "theme_color": "#0b1220",
+    "description": "Real-time collaborative code editor for pair programming and team collaboration.",
+    "icons": [
+        {
+            "src": "/code-commit.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
