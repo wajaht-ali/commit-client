@@ -33,7 +33,7 @@ const HomePage = () => {
                         </h1>
 
                         <p className="max-w-2xl text-lg md:text-xl text-slate-400 mb-10 fade-in-up delay-200">
-                            Work with teammates on the same code in real-time. See edits instantly, talk naturally through built-in <span className='underline text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-400 to-teal-400'>audio calls</span>, and solve problems together, just like sitting side-by-side.
+                            Work with teammates on the same code in real-time. See edits instantly, talk naturally through built-in <span className='text-transparent bg-clip-text bg-gradient-to-r from-sky-400 via-cyan-400 to-teal-400'>audio calls</span>, and solve problems together, just like sitting side-by-side.
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 fade-in-up delay-300">
@@ -54,7 +54,7 @@ const HomePage = () => {
                             )}
                             <button
                                 onClick={() => setIsDemoOpen(true)}
-                                className="px-8 py-4 bg-slate-800/50 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-600 rounded-full font-semibold text-lg transition-all backdrop-blur-sm"
+                                className="px-8 py-4 bg-slate-800/50 hover:bg-slate-800 text-slate-200 border border-slate-700 hover:border-slate-600 rounded-full font-semibold text-lg transition-all backdrop-blur-sm hover:cursor-pointer"
                             >
                                 View Demo
                             </button>

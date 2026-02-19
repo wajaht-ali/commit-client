@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaEye, FaEyeSlash, FaExclamationCircle } from "react-icons/fa";
@@ -128,7 +129,7 @@ const Signup = () => {
 
           <button
             onClick={handleGoogleSignup}
-            className="w-full py-3 px-4 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 rounded-xl transition-all duration-200 mb-6"
+            className="w-full py-3 px-4 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 rounded-xl transition-all duration-200 mb-6 hover:cursor-pointer"
           >
             <FcGoogle size={20} />
             <span className="text-sm font-medium">Continue with Google</span>
@@ -200,7 +201,7 @@ const Signup = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-purple-600 hover:bg-purple-500 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
+              className="w-full bg-purple-600 hover:bg-purple-500 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 hover:cursor-pointer"
             >
               Create Account
             </button>
@@ -210,7 +211,7 @@ const Signup = () => {
             Already have an account?{" "}
             <Link
               to="/auth/login"
-              className="text-purple-400 font-semibold hover:text-purple-300 hover:underline transition-colors"
+              className="text-purple-400 font-semibold hover:text-purple-300 hover:underline transition-colors hover:cursor-pointer"
             >
               Log In
             </Link>

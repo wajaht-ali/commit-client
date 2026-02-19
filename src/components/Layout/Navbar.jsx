@@ -151,7 +151,7 @@ const Navbar = ({ toggleModal }) => {
                             <>
                                 <button
                                     onClick={() => navigate("/auth/login")}
-                                    className="px-5 py-2 text-sm font-semibold text-white bg-sky-500 hover:bg-sky-400 rounded-full transition-all shadow-[0_0_20px_-5px_rgba(14,165,233,0.5)] hover:shadow-[0_0_25px_-5px_rgba(14,165,233,0.6)]"
+                                    className="px-5 py-2 text-sm font-semibold text-white bg-sky-500 hover:bg-sky-400 rounded-full transition-all shadow-[0_0_20px_-5px_rgba(14,165,233,0.5)] hover:shadow-[0_0_25px_-5px_rgba(14,165,233,0.6)] hover:cursor-pointer"
                                 >
                                     Login
                                 </button>

@@ -116,7 +116,7 @@ export default function Login() {
 
           <button
             onClick={handleGoogleLogin}
-            className="w-full py-3 px-4 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 rounded-xl transition-all duration-200 mb-6"
+            className="w-full py-3 px-4 flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-600 rounded-xl transition-all duration-200 mb-6 hover:cursor-pointer"
           >
             <FcGoogle size={20} />
             <span className="text-sm font-medium">Continue with Google</span>
@@ -184,7 +184,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-sky-500 hover:bg-sky-400 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-sky-500/20 hover:shadow-sky-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5"
+              className="w-full bg-sky-500 hover:bg-sky-400 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg shadow-sky-500/20 hover:shadow-sky-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 hover:cursor-pointer"
             >
               Sign In to Account
             </button>

@@ -6,7 +6,7 @@ import axios from "axios";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../../Firebase";
 import { ClipLoader } from "react-spinners";
-import { FaExclamationCircle } from "react-icons/fa";
+import { FaExclamationCircle, FaLaptopCode } from "react-icons/fa";
 
 export default function ResetPassword() {
     const [email, setEmail] = useState("");
@@ -65,9 +65,7 @@ export default function ResetPassword() {
                 <div className="relative z-10 max-w-lg text-center">
                     <div className="mb-6">
                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sky-500/10 border border-sky-500/30 mb-6">
-                            <svg className="w-8 h-8 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7h4a2 2 0 012 2v10a2 2 0 01-2 2h-4m0 0V5a2 2 0 00-2-2H9a2 2 0 00-2 2v14m4-7h2m2 0a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
+                            <FaLaptopCode className="h-8 w-8 text-sky-400" />
                         </div>
                     </div>
                     <h2 className="text-5xl lg:text-6xl font-bold mb-4 text-slate-50 leading-tight">
@@ -140,7 +138,7 @@ export default function ResetPassword() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 text-white font-bold py-3.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transform hover:-translate-y-1 active:translate-y-0"
+                                className="w-full bg-gradient-to-r from-sky-500 to-sky-600 hover:from-sky-400 hover:to-sky-500 text-white font-bold py-3.5 rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-sky-500/25 hover:shadow-sky-500/40 transform hover:-translate-y-1 active:translate-y-0 hover:cursor-pointer"
                             >
                                 Send Reset Link
                             </button>
@@ -156,8 +154,8 @@ export default function ResetPassword() {
                         {/* Footer Link */}
                         <p className="text-center text-sm text-slate-400">
                             Remember your password?{' '}
-                            <Link 
-                                to="/auth/login" 
+                            <Link
+                                to="/auth/login"
                                 className="text-sky-400 font-semibold hover:text-sky-300 hover:underline underline-offset-2 transition-colors duration-200"
                             >
                                 Sign In
@@ -166,9 +164,9 @@ export default function ResetPassword() {
 
                         <p className="text-center text-xs text-slate-500 mt-6">
                             Don't have an account?{' '}
-                            <Link 
-                                to="/auth/signup" 
-                                className="text-sky-400 font-semibold hover:text-sky-300 hover:underline underline-offset-2 transition-colors"
+                            <Link
+                                to="/auth/signup"
+                                className="text-sky-400 font-semibold hover:text-sky-300 hover:underline underline-offset-2 transition-colors hover:cursor-pointer"
                             >
                                 Create one
                             </Link>
