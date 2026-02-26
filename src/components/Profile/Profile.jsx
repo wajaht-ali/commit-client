@@ -124,7 +124,7 @@ const Profile = () => {
 
             <div className="mt-auto p-4 lg:p-6 border-t border-gray-700">
                 <div className="text-xs lg:text-sm text-gray-400 text-center">
-                    &copy; 2025 Commit. All rights reserved.
+                    &copy; {new Date().getFullYear()} Commit. All rights reserved.
                 </div>
             </div>
         </aside>

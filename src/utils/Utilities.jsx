@@ -26,9 +26,9 @@ export const copyRoomId = async (roomId) => {
 };
 
 export const languageOptions = [
-    { value: 'javascript', label: 'JavaScript' },
-    { value: 'python', label: 'Python' },
-    { value: 'cpp', label: 'C++' },
+    { value: 'javascript', label: 'JavaScript', status: 'notDisabled' },
+    { value: 'python', label: 'Python', status: 'disabled' },
+    { value: 'cpp', label: 'C++', status: 'disabled' },
 ];
 
 export const monacoLanguageMap = {

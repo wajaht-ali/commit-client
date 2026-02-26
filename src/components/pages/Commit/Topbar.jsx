@@ -4,6 +4,7 @@ import { HiSparkles } from "react-icons/hi2";
 import { languageOptions } from "../../../utils/Utilities";
 import { TbBrandJavascript, TbBrandCpp } from "react-icons/tb";
 import { IoLogoPython } from "react-icons/io";
+import { TbLockCancel } from "react-icons/tb";
 
 const TopBar = ({
     isMobile,
@@ -75,6 +76,7 @@ const TopBar = ({
                             {languageOptions.map((option) => (
                                 <button
                                     key={option.value}
+                                    disabled={option.status === 'disabled'}
                                     onClick={() => onLanguageSelect(option.value)}
                                     className={`w-full text-left px-3 py-2 flex items-center justify-between gap-2 hover:bg-[#21262d] transition-colors ${language === option.value ? 'bg-[#111] text-white' : 'text-[#c9d1d9]'
                                         }`}
@@ -82,6 +84,7 @@ const TopBar = ({
                                     <div className="flex items-center gap-2">
                                         <span className="text-base">{getLanguageIcon(option.value)}</span>
                                         <span className="text-xs sm:text-sm">{option.label}</span>
+                                        <span>{option.status === 'disabled' && <TbLockCancel className="text-sm text-red-500" />}</span>
                                     </div>
                                     {language === option.value && (
                                         <FaCheck className="text-xs text-green-500" />
@@ -102,7 +105,7 @@ const TopBar = ({
                     <FaPlay className="w-3 h-3 sm:w-3 sm:h-3 group-hover:scale-110 transition-transform" />
                     <span className="text-xs sm:text-sm font-medium">Run</span>
                 </button>
-                
+
                 <button
                     onClick={() => setIsAiModalOpen(true)}
                     className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-[3px] bg-emerald-500 hover:bg-emerald-600 text-white transition-all shadow-sm hover:shadow-md cursor-pointer group"

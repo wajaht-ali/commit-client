@@ -15,6 +15,8 @@ import NotFoundPage from "./components/Layout/NotFound.jsx";
 import FeaturesPage from "./components/pages/Features.jsx";
 import ContactUsPage from "./components/pages/Contact.jsx";
 import './App.css';
+import BugReportIcon from './components/ui/BugReportIcon.jsx';
+import BugReport from './components/pages/BugReport.jsx';
 
 function App() {
   return (
@@ -35,8 +37,11 @@ function App() {
           <Route path="organization" element={<Organization />} />
         </Route>
         <Route path="/editor/:roomId" element={<EditorPage />} />
+        <Route path="/report-bug" element={<BugReport />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      
+      <BugReportIcon />
     </>
   );
 }
