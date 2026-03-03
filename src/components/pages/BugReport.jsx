@@ -20,6 +20,7 @@ const BugReport = () => {
         setLoading(true);
         try {
             const res = await axios.post(`${API_URL}/api/v1/ai/report-bug`, { name: form.name, email: form.email, message: form.details });
+            console.log('res', res);
             if (res.status === 200 || res.status === 201) {
                 setSuccess(true);
             }

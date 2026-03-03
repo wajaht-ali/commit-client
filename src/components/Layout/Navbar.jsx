@@ -6,6 +6,7 @@ import { signOut } from "firebase/auth";
 import { useAuth } from "../../context/AuthContext";
 import { auth } from "../../Firebase";
 import userImg from "../../assets/user_icon.png";
+import logo from "../../assets/commit_logo.png";
 
 const Navbar = ({ toggleModal }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -57,12 +58,13 @@ const Navbar = ({ toggleModal }) => {
                         className="flex items-center gap-2 group"
                         onClick={closeAllMenus}
                     >
-                        <div className="p-2 rounded-lg bg-sky-500/10 group-hover:bg-sky-500/20 transition-colors">
-                            <FaLaptopCode className="h-6 w-6 text-sky-400" />
+                        <div className="">
+                            {/* <FaLaptopCode className="h-6 w-6 text-sky-400" /> */}
+                            <img src={logo} alt="commit_logo" className="size-18 text-sky-400" />
                         </div>
-                        <span className="text-xl font-bold tracking-tight text-white">
+                        {/* <span className="text-xl font-bold tracking-tight text-white">
                             Commit
-                        </span>
+                        </span> */}
                     </Link>
 
                     <div className="hidden md:flex items-center gap-x-1">

@@ -64,9 +64,9 @@ export default function ResetPassword() {
 
                 <div className="relative z-10 max-w-lg text-center">
                     <div className="mb-6">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sky-500/10 border border-sky-500/30 mb-6">
+                        {/* <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-sky-500/10 border border-sky-500/30 mb-6">
                             <FaLaptopCode className="h-8 w-8 text-sky-400" />
-                        </div>
+                        </div> */}
                     </div>
                     <h2 className="text-5xl lg:text-6xl font-bold mb-4 text-slate-50 leading-tight">
                         Recover Your<br />
